@@ -1,0 +1,17 @@
+{% requirePermission "translated:orders" %}
+
+{% extends "_layouts/cp" %}
+
+
+{% set title = "View Order" %}
+
+{% set selectedSubnavItem = 'orders' %}
+
+{% block actionButton %}
+    <a href="orders" class="btn">{{ "Cancel"|t('translated') }}</a>
+{% endblock %}
+
+{% set content %}
+    <h2>{{ "Orders CP Section body goes here"|t('translated') }}</h2>
+    <p class="textline"></p>
+{% endset %}

@@ -1,12 +1,4 @@
 <?php
-/**
- * translated plugin for Craft CMS 3.x
- *
- * Request translations from translated from the comfort of your dashboard
- *
- * @link      https://scaramanga.agency
- * @copyright Copyright (c) 2021 Scaramanga Agency
- */
 
 namespace scaramangagency\translated\migrations;
 
@@ -15,134 +7,51 @@ use scaramangagency\translated\Translated;
 use Craft;
 use craft\config\DbConfig;
 use craft\db\Migration;
+use craft\helpers\MigrationHelper;
 
-/**
- * @author    Scaramanga Agency
- * @package   Translated
- * @since     1.0.0
- */
-class Install extends Migration
-{
-    // Public Properties
-    // =========================================================================
+class Install extends Migration {
 
-    /**
-     * @var string The database driver to use
-     */
-    public $driver;
-
-    // Public Methods
-    // =========================================================================
-
-    /**
-     * @inheritdoc
-     */
-    public function safeUp()
-    {
-        $this->driver = Craft::$app->getConfig()->getDb()->driver;
-        if ($this->createTables()) {
-            $this->createIndexes();
-            $this->addForeignKeys();
-            // Refresh the db schema caches
-            Craft::$app->db->schema->refresh();
-            $this->insertDefaultData();
-        }
-
-        return true;
+    public function safeUp() {
+        $this->createTables();
+        $this->addForeignKeys();
     }
 
-   /**
-     * @inheritdoc
-     */
-    public function safeDown()
-    {
-        $this->driver = Craft::$app->getConfig()->getDb()->driver;
-        $this->removeTables();
-
-        return true;
+    public function safeDown() {
+        $this->dropForeignKeys();
+        $this->dropTables();
     }
 
-    // Protected Methods
-    // =========================================================================
-
-    /**
-     * @return bool
-     */
-    protected function createTables()
-    {
+    protected function createTables() {
         $tablesCreated = false;
+        $tableSchema = Craft::$app->db->schema->getTableSchema('{{%translated_orders}}');
 
-        $tableSchema = Craft::$app->db->schema->getTableSchema('{{%translated_order}}');
         if ($tableSchema === null) {
             $tablesCreated = true;
-            $this->createTable(
-                '{{%translated_order}}',
-                [
-                    'id' => $this->primaryKey(),
-                    'dateCreated' => $this->dateTime()->notNull(),
-                    'dateUpdated' => $this->dateTime()->notNull(),
-                    'uid' => $this->uid(),
-                    'siteId' => $this->integer()->notNull(),
-                    'some_field' => $this->string(255)->notNull()->defaultValue(''),
-                ]
-            );
+
+            $this->createTable('{{%translated_orders}}', [
+                'id' => $this->primaryKey(),
+                'dateCreated' => $this->dateTime()->notNull(),
+                'dateUpdated' => $this->dateTime()->notNull(),
+                'userId' => $this->integer(),
+                'dateOrdered' => $this->dateTime()->notNull(),
+                'dateReceived' => $this->dateTime()->notNull(),
+                'orderStatus' => $this->integer(),
+                'uid' => $this->uid(),
+            ]);
         }
 
         return $tablesCreated;
     }
 
-    /**
-     * @return void
-     */
-    protected function createIndexes()
-    {
-        $this->createIndex(
-            $this->db->getIndexName(
-                '{{%translated_order}}',
-                'some_field',
-                true
-            ),
-            '{{%translated_order}}',
-            'some_field',
-            true
-        );
-        // Additional commands depending on the db driver
-        switch ($this->driver) {
-            case DbConfig::DRIVER_MYSQL:
-                break;
-            case DbConfig::DRIVER_PGSQL:
-                break;
-        }
+    protected function addForeignKeys() {
+        $this->addForeignKey($this->db->getForeignKeyName('{{%translated_orders}}', 'userId'), '{{%translated_orders}}', 'userId', '{{%users}}', 'id', 'CASCADE', null);
     }
 
-    /**
-     * @return void
-     */
-    protected function addForeignKeys()
-    {
-        $this->addForeignKey(
-            $this->db->getForeignKeyName('{{%translated_order}}', 'siteId'),
-            '{{%translated_order}}',
-            'siteId',
-            '{{%sites}}',
-            'id',
-            'CASCADE',
-            'CASCADE'
-        );
+    protected function dropTables() {
+        $this->dropTableIfExists('{{%translated_orders}}');
     }
 
-    /**
-     * @return void
-     */
-    protected function insertDefaultData()
-    {
-    }
-
-    /**
-     * @return void
-     */
-    protected function removeTables()
-    {
-        $this->dropTableIfExists('{{%translated_order}}');
+    protected function dropForeignKeys() {
+        MigrationHelper::dropForeignKeyIfExists('{{%translated_orders}}', ['userId'], $this);
     }
 }

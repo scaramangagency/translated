@@ -1,21 +1,6 @@
-{# @var craft \craft\web\twig\variables\CraftVariable #}
-{#
-/**
- * translated plugin for Craft CMS 3.x
- *
- * translated Settings.twig
- *
- * @author    Scaramanga Agency
- * @copyright Copyright (c) 2021 Scaramanga Agency
- * @link      https://scaramanga.agency
- * @package   Translated
- * @since     1.0.0
- */
-#}
+{% requirePermission "translated:settings" %}
 
 {% import "_includes/forms" as forms %}
-
-{% do view.registerAssetBundle("scaramangagency\\translated\\assetbundles\\translated\\TranslatedAsset") %}
 
 {{ forms.textField({
     label: 'Some Field',
