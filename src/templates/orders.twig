@@ -1,0 +1,46 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * translated plugin for Craft CMS 3.x
+ *
+ * translated index.twig
+ *
+ * @author    Scaramanga Agency
+ * @copyright Copyright (c) 2021 Scaramanga Agency
+ * @link      https://scaramanga.agency
+ * @package   Translated
+ * @since     1.0.0
+ */
+#}
+
+{% extends "_layouts/cp" %}
+{% import "_includes/forms" as forms %}
+
+{% do view.registerAssetBundle("scaramangagency\\translated\\assetbundles\\translated\\TranslatedAsset") %}
+
+{% set docsUrl = "https://github.com/scaramangagency/translated/blob/master/README.md" %}
+
+{% set title = "translated | Orders" %}
+
+{% set pluginCpUrl = url('translated') %}
+
+{% set subnav = {
+    "orders": { label: "Orders"|t('translated'), url: url(pluginCpUrl ~ '/orders') },
+    "settings": { label: "Settings"|t('translated'), url: url(pluginCpUrl ~ '/settings') }
+} %}
+{% set selectedSubnavItem = 'orders' %}
+
+{% set crumbs = [
+    { label: "translated", url: url(pluginCpUrl) },
+    { label: "Orders"|t('translated'), url: url(pluginCpUrl ~ '/orders') },
+] %}
+
+{% block actionButton %}
+    <a href="{{ pluginCpUrl }}" class="btn submit add icon">{{ "Click Me!"|t('translated') }}</a>
+{% endblock %}
+
+{% set content %}
+    <h2>{{ "Orders CP Section body goes here"|t('translated') }}</h2>
+    <img src="{{ iconUrl }}" height="64" width="64" />
+    <p class="textline"></p>
+{% endset %}

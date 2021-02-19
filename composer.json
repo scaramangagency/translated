@@ -1,0 +1,49 @@
+{
+    "name": "scaramangagency/translated",
+    "description": "Request translations from translated from the comfort of your dashboard",
+    "type": "craft-plugin",
+    "version": "1.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "translated"
+    ],
+    "support": {
+        "docs": "https://github.com/scaramangagency/translated/blob/master/README.md",
+        "issues": "https://github.com/scaramangagency/translated/issues"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Scaramanga Agency",
+            "homepage": "https://scaramanga.agency"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0"
+    },
+    "require-dev": {
+      "craftcms/cms": "^3.2.0",
+      "codeception/codeception": "^3.0",
+      "vlucas/phpdotenv": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+          "scaramangagency\\translated\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "translated",
+        "handle": "translated",
+        "developer": "Scaramanga Agency",
+        "developerUrl": "https://scaramanga.agency",
+        "documentationUrl": "https://github.com/scaramangagency/translated/blob/master/README.md",
+        "changelogUrl": "https://raw.githubusercontent.com/scaramangagency/translated/master/CHANGELOG.md",
+        "components": {
+            "order": "scaramangagency\\translated\\services\\Order"
+        },
+        "class": "scaramangagency\\translated\\Translated"
+    }
+}
