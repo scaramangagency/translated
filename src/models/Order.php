@@ -28,7 +28,20 @@ class Order extends Model
     /**
      * @var string
      */
-    public $someAttribute = 'Some Default';
+    public $title;
+    public $sourceLanguage;
+    public $targetLanguage;
+    public $translationContent;
+    public $translationAsset;
+    public $translationSubject;
+    public $translationLevel;
+    public $translationNotes;
+    public $wordCount;
+    public $userId;
+
+    public $quoteDeliveryDate;
+    public $quoteTotal;
+    public $quotePID;
 
     // Public Methods
     // =========================================================================
@@ -39,8 +52,19 @@ class Order extends Model
     public function rules()
     {
         return [
-            ['someAttribute', 'string'],
-            ['someAttribute', 'default', 'value' => 'Some Default'],
+            [['sourceLanguage', 'targetLanguage'], 'required'],
+            ['translationContent', 'string'],
+            ['translationAsset', 'integer'],
+            ['translationNotes', 'string'],
+            ['translationLevel', 'string'],
+            ['wordCount', 'integer'],
+            ['userId', 'integer'],
+            ['title', 'string'],
+            ['translationSubject', 'string'],
+
+            ['quoteDeliveryDate', 'date'],
+            ['quoteTotal', 'float'],
+            ['quotePID', 'integer']
         ];
     }
 }

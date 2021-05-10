@@ -1,10 +1,8 @@
 {% requirePermission "translated:orders" %}
 
 {% extends "_layouts/cp" %}
-
-
+{% import "_includes/forms" as forms %}
 {% set title = "Place Order" %}
-
 {% set selectedSubnavItem = 'orders' %}
 
 {% block actionButton %}
@@ -12,6 +10,112 @@
 {% endblock %}
 
 {% set content %}
-    <h2>{{ "Orders CP Section body goes here"|t('translated') }}</h2>
-    <p class="textline"></p>
+    
+    {% if not availableLanguages or not availableSubjects %}
+        Failed to get a response from the translated API. Try again later.
+    {% else %}
+        <form method="post">
+
+            {{ csrfInput() }}
+            <input type="hidden" name="action" value="translated/orders/request-quote">
+
+            {% namespace "order" %}
+                {{ forms.textField({
+                    label: 'Project Name',
+                    instructions: 'Add a title to this translation quote',
+                    id: 'title',
+                    name: 'title',
+                    required: 'required',
+                }) }}
+
+                Economy: Machine Translation with Light human review. Cheapest.
+                Professional: Human Translation with quality control. Mid-price.
+                Premium: Human Translation with Specialist review and quality control. Most expensive.
+
+                {{ forms.selectField({
+                    label: 'Translation Level',
+                    id: 'translationLevel',
+                    name: 'translationLevel',
+                    options: {
+                        'T': 'Professional',
+                        'R': 'Premium',
+                        'P': 'Economy'
+                    },
+                    value: 'economy'
+                }) }}
+
+                {{ forms.selectField({
+                    label: 'Source Language',
+                    instructions: 'What language is your content currently written in?',
+                    id: 'sourceLanguage',
+                    name: 'sourceLanguage',
+                    required: 'required',
+                    options: availableLanguages,
+                    value: selectedSource ?? 'English'
+                }) }}
+
+                {{ forms.multiSelectField({
+                    label: 'Target Language',
+                    instructions: 'What language do you want to translate into? You can select multiple options.',
+                    id: 'targetLanguage',
+                    name: 'targetLanguage',
+                    required: 'required',
+                    multiple: 'multiple',
+                    options: availableLanguages,
+                    value: selectedTarget ?? ''
+                }) }}
+
+                {{ forms.selectField({
+                    label: 'Subject',
+                    instructions: 'What industry does your content relate to?',
+                    id: 'translationSubject',
+                    name: 'translationSubject',
+                    options: availableSubjects,
+                    value: 'general'
+                }) }}
+
+                {{ forms.textareaField({
+                    label: 'Content',
+                    id: 'translationContent',
+                    name: 'translationContent',
+                    required: 'required',
+                }) }}
+
+                OR
+                
+                {{ forms.elementSelect({
+                    id: "translationAsset",
+                    name: "translationAsset",
+                    viewMode: "large",
+                    elementType: elementType,
+                    criteria: {
+                        kind: ['pdf', 'plaintext', 'txt', 'xml', 'html', 'htm', 'xliff', 'zip', 'rtf', 'doc','docx', 'aea'],
+                    },
+                    jsClass: 'Craft.AssetSelectInput',
+                    selectionLabel: "Select file to translate",
+                    sources: [],
+                    limit: 1,
+                    warning: false
+                }) }}
+
+                {{ forms.textField({
+                    label: 'Word count',
+                    id: 'wordCount',
+                    name: 'wordCount',
+                    required: 'required',
+                }) }}
+
+                {{ forms.textareaField({
+                    label: 'Notes',
+                    id: 'translationNotes',
+                    name: 'translationNotes',
+                    required: 'required'
+                }) }}
+
+                <input type="hidden" id="userId" name="userId" value="{{ currentUser.id }}" />
+            {% endnamespace %}
+
+            <input type="submit" class="submit btn" value="{{ 'Request Quote'|t }}">
+        </form>
+    {% endif %}
 {% endset %}

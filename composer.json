@@ -2,7 +2,7 @@
     "name": "scaramangagency/translated",
     "description": "Request translations from translated from the comfort of your dashboard",
     "type": "craft-plugin",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "keywords": [
         "craft",
         "cms",
@@ -22,10 +22,11 @@
         }
     ],
     "require": {
-        "craftcms/cms": "^3.1.0"
+        "craftcms/cms": "^3.6.0",
+        "putyourlightson/craft-log-to-file": "^1.0.0"
     },
     "require-dev": {
-      "craftcms/cms": "^3.2.0",
+      "craftcms/cms": "^3.6.0",
       "codeception/codeception": "^3.0",
       "vlucas/phpdotenv": "^3.0"
     },
@@ -42,7 +43,8 @@
         "documentationUrl": "https://github.com/scaramangagency/translated/blob/master/README.md",
         "changelogUrl": "https://raw.githubusercontent.com/scaramangagency/translated/master/CHANGELOG.md",
         "components": {
-            "order": "scaramangagency\\translated\\services\\Order"
+            "orderService": "scaramangagency\\translated\\services\\OrderService",
+            "utilityService": "scaramangagency\\translated\\services\\UtilityService"
         },
         "class": "scaramangagency\\translated\\Translated"
     }

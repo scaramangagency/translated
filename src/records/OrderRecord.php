@@ -11,7 +11,7 @@ use craft\db\ActiveRecord;
  * @package   Translated
  * @since     1.0.0
  */
-class Order extends ActiveRecord {
+class OrderRecord extends ActiveRecord {
 
     public static function tableName() {
         return '{{%translated_orders}}';

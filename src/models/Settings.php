@@ -28,7 +28,8 @@ class Settings extends Model
     /**
      * @var string
      */
-    public $someAttribute = 'Some Default';
+    public $translatedUsername;
+    public $translatedPassword;
 
     // Public Methods
     // =========================================================================
@@ -39,8 +40,7 @@ class Settings extends Model
     public function rules()
     {
         return [
-            ['someAttribute', 'string'],
-            ['someAttribute', 'default', 'value' => 'Some Default'],
+            [['translatedUsername', 'translatedPassword'], 'required']
         ];
     }
 }

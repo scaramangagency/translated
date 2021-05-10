@@ -12,6 +12,7 @@ use craft\services\UserPermissions;
 use craft\services\Elements;
 use craft\events\PluginEvent;
 use craft\web\UrlManager;
+use craft\helpers\UrlHelper;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\events\RegisterComponentTypesEvent;
@@ -40,15 +41,19 @@ class Translated extends Plugin
         $this->registerCpUrls();
         $this->registerPermissions();
         $this->registerElementType();
-
-        Event::on(Plugins::class, Plugins::EVENT_AFTER_INSTALL_PLUGIN, function (PluginEvent $event) {
-            if ($event->plugin === $this) {
-                $request = Craft::$app->getRequest();
-                if ($request->isCpRequest) {
-                    Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('translated/settings'))->send();
+        
+        Event::on(
+            Plugins::class,
+            Plugins::EVENT_AFTER_INSTALL_PLUGIN,
+            function (PluginEvent $event) {
+                if ($event->plugin === $this) {
+                    $request = Craft::$app->getRequest();
+                    if ($request->isCpRequest) {
+                        Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('translated/settings'))->send();
+                    }
                 }
             }
-        });
+        );
 
         Craft::info(
             Craft::t('translated', '{name} plugin loaded', ['name' => $this->name]),
@@ -108,32 +113,60 @@ class Translated extends Plugin
     // Private Methods
     // =========================================================================
     private function registerElementType() {
-        Event::on(Elements::class, Elements::EVENT_REGISTER_ELEMENT_TYPES, function(RegisterComponentTypesEvent $event) {
-            $event->types[] = Order::class;
-        });
+        Event::on(
+            Elements::class,
+            Elements::EVENT_REGISTER_ELEMENT_TYPES, 
+            function(RegisterComponentTypesEvent $event) {
+                $event->types[] = Order::class;
+            }
+        );
     }
 
     private function registerCpUrls() {
-        Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES, function (RegisterUrlRulesEvent $event) {
+        Event::on(
+            UrlManager::class,
+            UrlManager::EVENT_REGISTER_CP_URL_RULES, 
+            function (RegisterUrlRulesEvent $event) {
+                $event->rules = array_merge($event->rules, [
+                    'translated/settings' => 'translated/settings/index',
 
-        });
+                    'translated/orders' => 'translated/orders/index',
+                    'translated/orders/new' => 'translated/orders/new-order',
+                    'translated/orders/view/<id>' => 'translated/orders/view-order',
+                ]);
+            }
+        );
+    }
+
+    private function registerSiteUrls() {
+        Event::on(
+            UrlManager::class,
+            UrlManager::EVENT_REGISTER_SITE_URL_RULES,
+            function (RegisterUrlRulesEvent $event) {
+                $event->rules['translatedApi'] = 'translated/orders/handleDelivery';
+            }
+        );
     }
 
     private function registerPermissions() {
-        Event::on(UserPermissions::class, UserPermissions::EVENT_REGISTER_PERMISSIONS, function (RegisterUserPermissionsEvent $event) {
-            $event->permissions[Craft::t('translated', 'translated')] = [
-                'trnslated:settings' => [
-                    'label' => Craft::t('translated', 'Settings'),
-                ],
-                'translated:orders' => [
-                    'label' => Craft::t('seomatic', 'View orders'),
-                    'nested' => [
-                        'translated:orders:makeorders' => [
-                            'label' => Craft::t('seomatic', 'Place orders'),
+        Event::on(
+            UserPermissions::class,
+            UserPermissions::EVENT_REGISTER_PERMISSIONS,
+            function (RegisterUserPermissionsEvent $event) {
+                $event->permissions[Craft::t('translated', 'translated')] = [
+                    'trnslated:settings' => [
+                        'label' => Craft::t('translated', 'Settings'),
+                    ],
+                    'translated:orders' => [
+                        'label' => Craft::t('translated', 'View orders'),
+                        'nested' => [
+                            'translated:orders:makeorders' => [
+                                'label' => Craft::t('translated', 'Place orders'),
+                            ]
                         ]
                     ]
-                ]
-            ];
-        });
+                ];
+            }
+        );
     }
 }

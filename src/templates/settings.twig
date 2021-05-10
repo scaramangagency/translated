@@ -1,11 +1,41 @@
 {% requirePermission "translated:settings" %}
 
+{% extends "_layouts/cp" %}
 {% import "_includes/forms" as forms %}
+{% set selectedSubnavItem = 'settings' %}
+{% set title = 'Translated' %}
 
-{{ forms.textField({
-    label: 'Some Field',
-    instructions: 'Enter some setting here.',
-    id: 'someAttribute',
-    name: 'someAttribute',
-    value: settings['someAttribute']})
-}}
+{% set content %}
+    <form method="post">
+
+        {{ csrfInput() }}
+        <input type="hidden" name="action" value="translated/settings/save-plugin-settings">
+
+        {% namespace "settings" %}
+            {{ forms.autosuggestField({
+                label: 'translated Username',
+                id: 'translatedUsername',
+                name: 'translatedUsername',
+                required: 'required',
+                value: settings['translatedUsername'],
+                suggestions: craft.cp.getEnvSuggestions(),
+                suggestEnvVars: true,
+                errors: settings.getErrors('translatedUsername')})
+            }}
+
+            {{ forms.autosuggestField({
+                label: 'translated Password',
+                id: 'translatedPassword',
+                name: 'translatedPassword',
+                required: 'required',
+                value: settings['translatedPassword'],
+                suggestions: craft.cp.getEnvSuggestions(),
+                suggestEnvVars: true,
+                errors: settings.getErrors('translatedPassword')})
+            }}
+        {% endnamespace %}
+        
+        <p>clean up files after translation has been received?</p>
+        <input type="submit" class="submit btn" value="{{ 'Save'|t }}">
+    </form>
+{% endset %}

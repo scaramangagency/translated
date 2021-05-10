@@ -8,26 +8,53 @@ use Craft;
 use craft\base\Element;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\Html;
+use craft\helpers\UrlHelper;
 use craft\elements\User;
 
 class Order extends Element
 {
+    const STATUS_PENDING = 1;
+	const STATUS_PROCESSING = 2;
+	const STATUS_DELIVERED = 3;
+	const STATUS_REJECTED = 4;
+
     // Public Properties
     // =========================================================================
 
-    public $placedBy;
+    public $userId;
     public $authorisedBy;
-    public $status;
     public $dateApproved;
     public $dateRejected;
-    public $dateDelivered;
-    public $dueBy;
+    public $dateFulfilled;
+    public $estimatedDeliveryDate;
+    public $dateOrdered;
+    public $orderStatus = self::STATUS_PENDING;
+
+    public $title;
+    public $sourceLanguage;
+    public $targetLanguage;
+    public $translationContent;
+    public $translationAsset;
+    public $translationSubject;
+    public $translationLevel;
+    public $translationNotes;
+    public $wordCount;
+
+    public $quoteDeliveryDate;
+    public $quoteTotal;
+    public $quotePID;
 
     // Static Methods
     // =========================================================================
 
-    public static function displayName(): string {
-        return Craft::t('translated', 'translated Order');
+    public static function displayName(): string
+    {
+        return 'translated Order';
+    }
+
+    public function getCpEditUrl()
+    {
+        return UrlHelper::cpUrl('translated/orders/view/'.$this->id);
     }
 
     public static function refHandle() {
@@ -41,25 +68,25 @@ class Order extends Element
     protected static function defineSources(string $context = null): array
     {
         $sources = [
-            '*' => [
-                'key' => '*',
-                'label' => Craft::t('translated', 'All Orders'),
+            'orderStatus:1' => [
+                'key' => 'orderStatus:1',
+                'label' => 'Awaiting Authorisation',
+                'criteria' => ['status' => self::STATUS_PENDING]
             ],
-            'status:1' => [
-                'key' => 'status:1',
-                'label' => Craft::t('translated', 'Awaiting Authorisation'),
+            'orderStatus:2' => [
+                'key' => 'orderStatus:2',
+                'label' => 'In Process',
+                'criteria' => ['orderStatus' => self::STATUS_PROCESSING]
             ],
-            'status:2' => [
-                'key' => 'status:1',
-                'label' => Craft::t('translated', 'Pending Delivery'),
+            'orderStatus:3' => [
+                'key' => 'orderStatus:3',
+                'label' => 'Completed',
+                'criteria' => ['orderStatus' => self::STATUS_DELIVERED]
             ],
-            'status:3' => [
-                'key' => 'status:2',
-                'label' => Craft::t('translated', 'Completed'),
-            ],
-            'status:4' => [
-                'key' => 'status:3',
-                'label' => Craft::t('translated', 'Rejected'),
+            'orderStatus:4' => [
+                'key' => 'orderStatus:4',
+                'label' => 'Rejected',
+                'criteria' => ['orderStatus' => self::STATUS_REJECTED]
             ]
         ];
 
@@ -74,15 +101,15 @@ class Order extends Element
         $attributes = parent::datetimeAttributes();
         $attributes[] = 'dateApproved';
         $attributes[] = 'dateRejected';
-        $attributes[] = 'dateDelivered';
-        $attributes[] = 'dueBy';
+        $attributes[] = 'dateFulfilled';
+        $attributes[] = 'estimatedDeliveryDate';
 
         return $attributes;
     }
 
     public function getUser() {
-        if ($this->placedBy !== null) {
-            return Craft::$app->getUsers()->getUserById($this->placedBy);
+        if ($this->userId !== null) {
+            return Craft::$app->getUsers()->getUserById($this->userId);
         }
 
         return null;
@@ -96,11 +123,38 @@ class Order extends Element
         return null;
     }
 
-    public function placedBy() {
-        return $this->getUser()->fullName ?? '';
+    public function getEstimatedDeliveryDate() {
+        if ($this->quoteDeliveryDate !== null) {
+            return $this->quoteDeliveryDate;
+        }
+
+        return null;
     }
 
-    public function authorisedBy() {
+
+    public function getOwner() {
+       return $this->getUser()->fullName ?? '';
+    }
+
+    public function getStatus() {
+        switch ($this->orderStatus) {
+            case 1:
+                $status = 'Pending';
+                break;
+            case 2:
+                $status = 'Processing';
+                break;
+            case 3:
+                $status = 'Delivered';
+                break;
+            case 4:
+                $status = 'Rejected';
+                break;
+        }
+        return '<span class="label order-status ' . strtolower($status) .'">'. $status .'</span>';
+    }
+
+    public function getAuthoriser() {
         return $this->getAuthorisedBy()->fullName ?? '';
     }
 
@@ -109,48 +163,50 @@ class Order extends Element
 
     protected static function defineTableAttributes(): array {
         return [
-            'id' => ['label' => Craft::t('translated', 'Order')],
-            'status' => ['label' => Craft::t('translated', 'Status')],
-            'dueBy' => ['label' => Craft::t('translated', 'Due By')],
-            'placedBy' => ['label' => Craft::t('translated', 'Placed By')],
-            'authorisedBy' => ['label' => Craft::t('translated', 'Authorised By')],
-            'dateApproved' => ['label' => Craft::t('translated', 'Date Approved')],
-            'dateRejected' => ['label' => Craft::t('translated', 'Date Rejected')],
-            'dateDelivered' => ['label' => Craft::t('translated', 'Date Delivered')],
+            'title' => ['label' => 'Title'],
+            'orderStatus' => ['label' => 'Status'],
+            'estimatedDeliveryDate' => ['label' => 'Estimated delivery date'],
+            'ownedBy' => ['label' => 'Placed By'],
+            'authorisedBy' => ['label' => 'Authorised By'],
+            'rejectedBy' => ['label' => 'Rejected By'],
+            'dateApproved' => ['label' => 'Approval date'],
+            'dateRejected' => ['label' => 'Rejection date'],
+            'dateFulfilled' => ['label' => 'Fulfilment date']
         ];
     }
 
     protected static function defineDefaultTableAttributes(string $source): array {
-        return ['id', 'status', 'dueBy', 'placedBy', 'authorisedBy', 'dateApproved', 'dateRejected', 'dateDelivered'];
+        return ['title', 'orderStatus', 'estimatedDeliveryDate', 'ownedBy', 'authorisedBy', 'dateApproved', 'dateRejected', 'dateFulfilled'];
     }
 
     protected static function defineSortOptions(): array {
         return [
-            'id' => Craft::t('translated', 'Order'),
-            'dateApproved' => Craft::t('translated', 'Date Approved'),
-            'dateDelivered' => Craft::t('translated', 'Date Delivered')
+            'title' => 'Title',
+            'dateApproved' => 'Approval date',
+            'dateFulfilled' => 'Fulfilment date'
         ];
     }
 
     protected function tableAttributeHtml(string $attribute): string {
         switch ($attribute) {
-            case 'placedBy': {
-                return $this->placedBy() ?: '';
+            case 'title': {
+                return $this->title;
+            }
+            case 'ownedBy': {
+                return $this->getOwner() ?: '';
             }
             case 'authorisedBy': {
-                return $this->authorisedBy() ?: '';
+               return $this->getAuthoriser() ?: '';
             }
-            case 'status': {
-                // call to service to get actual status
-                return 'y';
+            case 'orderStatus': {
+                return $this->getStatus();
             }
-            case 'dueBy': {
-                // call to service to get actual due date?
-                return 'tomorrow';
+            case 'estimatedDeliveryDate': {
+                return $this->getEstimatedDeliveryDate();
             }
             case 'dateApproved':
             case 'dateRejected': 
-            case 'dateDelivered': {
+            case 'dateFulfilled': {
                 return ($this->$attribute) ? parent::tableAttributeHtml($attribute) : '-';
             }
             default: {

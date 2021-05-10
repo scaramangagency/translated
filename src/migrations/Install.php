@@ -33,10 +33,28 @@ class Install extends Migration {
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'userId' => $this->integer(),
-                'dateOrdered' => $this->dateTime()->notNull(),
-                'dateReceived' => $this->dateTime()->notNull(),
+                'authorisedBy' => $this->integer(),
+                'dateOrdered' => $this->dateTime(),
+                'dateApproved' => $this->dateTime(),
+                'dateRejected' => $this->dateTime(),
+                'dateFulfilled' => $this->dateTime(),
                 'orderStatus' => $this->integer(),
-                'uid' => $this->uid(),
+
+                'sourceLanguage' => $this->string(255),
+                'targetLanguage' => $this->string(255),
+                'translationContent' => $this->text(),
+                'translationAsset' => $this->integer(),
+                'translationNotes' => $this->text(),
+                'translationSubject' => $this->text(),
+                'translationLevel' => $this->string(20),
+                'wordCount' => $this->integer(),
+                'title' => $this->text(),
+
+                'quoteDeliveryDate' => $this->dateTime(),
+                'quoteTotal' => $this->float(),
+                'quotePID' => $this->integer(),
+
+                'uid' => $this->uid()
             ]);
         }
 
