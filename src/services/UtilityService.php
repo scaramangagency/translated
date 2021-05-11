@@ -2,7 +2,7 @@
 /**
  * translated plugin for Craft CMS 3.x
  *
- * Request translations from translated from the comfort of your dashboard
+ * Request translations via translated from the comfort of your dashboard
  *
  * @link      https://scaramanga.agency
  * @copyright Copyright (c) 2021 Scaramanga Agency
@@ -26,9 +26,6 @@ class UtilityService extends Component
     // Public Methods
     // =========================================================================
 
-    /*
-     * @return mixed
-     */
     public function fetchAvailableLanguages($settings)
     {
         $params = [
@@ -37,10 +34,10 @@ class UtilityService extends Component
             'f' => 'll',
             'of' => 'json'
         ];
-        
+
         try {
             $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL,'https://www.translated.net/hts/?'.http_build_query($params));
+            curl_setopt($ch, CURLOPT_URL, 'https://www.translated.net/hts/?' . http_build_query($params));
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
@@ -52,9 +49,12 @@ class UtilityService extends Component
         }
 
         $res = json_decode($res);
-        
+
         if ($res->code == 0) {
-            LogToFile::error('translated API returned an error when fetching languages. Error: ' . $res->message, 'translated');
+            LogToFile::error(
+                'translated API returned an error when fetching languages. Error: ' . $res->message,
+                'translated'
+            );
             return false;
         }
 
@@ -62,7 +62,7 @@ class UtilityService extends Component
         $selectedSource = '';
         $selectedTarget = [];
 
-        for ($i = 0; $i < count((array)$res); $i++) { 
+        for ($i = 0; $i < count((array) $res); $i++) {
             if (property_exists($res, $i)) {
                 $decorateLanguages[] = [
                     'label' => $res->{$i}->name,
@@ -72,13 +72,15 @@ class UtilityService extends Component
                 if (Craft::$app->sites->primarySite->language == $res->{$i}->rfc3066) {
                     $selectedSource = $res->{$i}->name;
                 }
-            
+
                 $sites = Craft::$app->sites->allSites;
 
                 foreach ($sites as $site) {
-                    if ($site->id != Craft::$app->sites->primarySite->id 
-                        && $site->language == $res->{$i}->rfc3066
-                        && Craft::$app->sites->primarySite->language != $res->{$i}->rfc3066) {
+                    if (
+                        $site->id != Craft::$app->sites->primarySite->id &&
+                        $site->language == $res->{$i}->rfc3066 &&
+                        Craft::$app->sites->primarySite->language != $res->{$i}->rfc3066
+                    ) {
                         $selectedTarget[] = $res->{$i}->name;
                     }
                 }
@@ -100,10 +102,10 @@ class UtilityService extends Component
             'f' => 'subjects',
             'of' => 'json'
         ];
-        
+
         try {
             $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL,'https://www.translated.net/hts/?'.http_build_query($params));
+            curl_setopt($ch, CURLOPT_URL, 'https://www.translated.net/hts/?' . http_build_query($params));
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
@@ -115,15 +117,18 @@ class UtilityService extends Component
         }
 
         $res = json_decode($res);
-        
+
         if ($res->code == 0) {
-            LogToFile::error('translated API returned an error when fetching subjects. Error: ' . $res->message, 'translated');
+            LogToFile::error(
+                'translated API returned an error when fetching subjects. Error: ' . $res->message,
+                'translated'
+            );
             return false;
         }
 
         $decorateSubjects = [];
 
-        for ($i = 0; $i < count((array)$res); $i++) { 
+        for ($i = 0; $i < count((array) $res); $i++) {
             if (property_exists($res, $i)) {
                 $decorateSubjects[] = [
                     'label' => ucfirst(str_replace('_', ' ', $res->{$i})),

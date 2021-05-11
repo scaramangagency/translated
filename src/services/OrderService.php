@@ -2,7 +2,7 @@
 /**
  * translated plugin for Craft CMS 3.x
  *
- * Request translations from translated from the comfort of your dashboard
+ * Request translations via translated from the comfort of your dashboard
  *
  * @link      https://scaramanga.agency
  * @copyright Copyright (c) 2021 Scaramanga Agency
@@ -29,10 +29,10 @@ class OrderService extends Component
     // =========================================================================
     public function getOrder($id)
     {
-        $params = [ 
+        $params = [
             'id' => $id
         ];
-        
+
         $order = new OrderRecord();
         $order = OrderRecord::findOne($params);
 
@@ -48,18 +48,20 @@ class OrderService extends Component
         $settings = Translated::$plugin->getSettings();
         $orderRecord = new OrderRecord();
 
-        $orderRecord->setAttributes([
-            'sourceLanguage' => $data['sourceLanguage'],
-            'targetLanguage' => $data['targetLanguage'],
-            'title' => $data['title'],
-            'translationLevel' => $data['translationLevel'],
-            'wordCount' => $data['wordCount'],
-            'translationSubject' => $data['translationSubject'],
-            'translationNotes' => $data['translationNotes'],
-            'userId' => $data['userId'],
-            'dateOrdered' => date('c'),
-            'orderStatus' => 1
-        ], false);
+        $orderRecord->setAttributes(
+            [
+                'sourceLanguage' => $data['sourceLanguage'],
+                'targetLanguage' => $data['targetLanguage'],
+                'title' => $data['title'],
+                'translationLevel' => $data['translationLevel'],
+                'wordCount' => $data['wordCount'],
+                'translationSubject' => $data['translationSubject'],
+                'translationNotes' => $data['translationNotes'],
+                'userId' => $data['userId'],
+                'orderStatus' => 1
+            ],
+            false
+        );
 
         if ($data['translationAsset']) {
             $orderRecord->setAttribute('translationAsset', $data['translationAsset']);
@@ -86,20 +88,22 @@ class OrderService extends Component
             'subject' => $data['translationSubject'],
             'instructions' => $data['translationNotes']
         ];
-        
+
         if ($data['translationAsset']) {
-            $translationAsset = Asset::find()->id($data['translationAsset'])->one();
+            $translationAsset = Asset::find()
+                ->id($data['translationAsset'])
+                ->one();
 
             $params['text'] = $translationAsset->url;
             $params['df'] = $translationAsset->mimeType;
         } else {
             $params['text'] = $data['translationContent'];
         }
-                 
+
         try {
             $ch = curl_init();
 
-            curl_setopt($ch, CURLOPT_URL,'https://www.translated.net/hts/?'.http_build_query($params));
+            curl_setopt($ch, CURLOPT_URL, 'https://www.translated.net/hts/?' . http_build_query($params));
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
@@ -113,21 +117,30 @@ class OrderService extends Component
         $res = json_decode($res);
 
         if ($res->code == 0) {
-            LogToFile::error('translated API returned an error when generating a quote. Error: ' . $res->message, 'translated');
+            LogToFile::error(
+                'translated API returned an error when generating a quote. Error: ' . $res->message,
+                'translated'
+            );
             return false;
         }
 
         $utc = new \DateTimeZone('UTC');
         $dt = new \DateTime($res->delivery_date, $utc);
 
-        $orderRecord->setAttributes([
-            'quoteDeliveryDate' => $dt->format('c'),
-            'quoteTotal' => $res->total,
-            'quotePID' => $res->pid
-        ], false);
+        $orderRecord->setAttributes(
+            [
+                'quoteDeliveryDate' => $dt->format('c'),
+                'quoteTotal' => $res->total,
+                'quotePID' => $res->pid
+            ],
+            false
+        );
 
         if (!$orderRecord->save()) {
-            LogToFile::error('Failed to update the order record with the quote information from translated', 'translated');
+            LogToFile::error(
+                'Failed to update the order record with the quote information from translated',
+                'translated'
+            );
             return false;
         }
 

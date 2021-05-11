@@ -10,16 +10,11 @@ use craft\web\Controller;
 
 class SettingsController extends Controller
 {
-
     // Public Methods
     // =========================================================================
 
-    /**
-     * Render settings page
-     *
-     * @return Response
-     */
-    public function actionIndex() {
+    public function actionIndex()
+    {
         $settings = Translated::$plugin->getSettings();
 
         return $this->renderTemplate('translated/settings', [
@@ -27,12 +22,8 @@ class SettingsController extends Controller
         ]);
     }
 
-    /**
-     * Save plugin settings
-     *
-     * @return Response|null
-     */
-    public function actionSavePluginSettings() {
+    public function actionSavePluginSettings()
+    {
         $this->requirePostRequest();
 
         $settings = Craft::$app->getRequest()->getBodyParam('settings', []);
@@ -52,9 +43,7 @@ class SettingsController extends Controller
             return null;
         }
 
-
         Craft::$app->getSession()->setNotice(Craft::t('app', 'Plugin settings saved.'));
         return $this->redirectToPostedUrl();
     }
-
 }

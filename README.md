@@ -1,6 +1,6 @@
 # translated plugin for Craft CMS 3.x
 
-Request translations from translated from the comfort of your dashboard
+Request translations via translated from the comfort of your dashboard
 
 ## Requirements
 

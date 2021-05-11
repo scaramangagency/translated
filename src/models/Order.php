@@ -2,7 +2,7 @@
 /**
  * translated plugin for Craft CMS 3.x
  *
- * Request translations from translated from the comfort of your dashboard
+ * Request translations via translated from the comfort of your dashboard
  *
  * @link      https://scaramanga.agency
  * @copyright Copyright (c) 2021 Scaramanga Agency
@@ -25,9 +25,6 @@ class Order extends Model
     // Public Properties
     // =========================================================================
 
-    /**
-     * @var string
-     */
     public $title;
     public $sourceLanguage;
     public $targetLanguage;
@@ -46,9 +43,6 @@ class Order extends Model
     // Public Methods
     // =========================================================================
 
-    /**
-     * @inheritdoc
-     */
     public function rules()
     {
         return [

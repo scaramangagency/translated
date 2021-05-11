@@ -1,6 +1,6 @@
 {
     "name": "scaramangagency/translated",
-    "description": "Request translations from translated from the comfort of your dashboard",
+    "description": "Request translations via translated from the comfort of your dashboard",
     "type": "craft-plugin",
     "version": "1.0.1",
     "keywords": [

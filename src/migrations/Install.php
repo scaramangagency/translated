@@ -9,19 +9,22 @@ use craft\config\DbConfig;
 use craft\db\Migration;
 use craft\helpers\MigrationHelper;
 
-class Install extends Migration {
-
-    public function safeUp() {
+class Install extends Migration
+{
+    public function safeUp()
+    {
         $this->createTables();
         $this->addForeignKeys();
     }
 
-    public function safeDown() {
+    public function safeDown()
+    {
         $this->dropForeignKeys();
         $this->dropTables();
     }
 
-    protected function createTables() {
+    protected function createTables()
+    {
         $tablesCreated = false;
         $tableSchema = Craft::$app->db->schema->getTableSchema('{{%translated_orders}}');
 
@@ -34,7 +37,7 @@ class Install extends Migration {
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'userId' => $this->integer(),
                 'authorisedBy' => $this->integer(),
-                'dateOrdered' => $this->dateTime(),
+                'dateCreated' => $this->dateTime(),
                 'dateApproved' => $this->dateTime(),
                 'dateRejected' => $this->dateTime(),
                 'dateFulfilled' => $this->dateTime(),
@@ -61,15 +64,26 @@ class Install extends Migration {
         return $tablesCreated;
     }
 
-    protected function addForeignKeys() {
-        $this->addForeignKey($this->db->getForeignKeyName('{{%translated_orders}}', 'userId'), '{{%translated_orders}}', 'userId', '{{%users}}', 'id', 'CASCADE', null);
+    protected function addForeignKeys()
+    {
+        $this->addForeignKey(
+            $this->db->getForeignKeyName('{{%translated_orders}}', 'userId'),
+            '{{%translated_orders}}',
+            'userId',
+            '{{%users}}',
+            'id',
+            'CASCADE',
+            null
+        );
     }
 
-    protected function dropTables() {
+    protected function dropTables()
+    {
         $this->dropTableIfExists('{{%translated_orders}}');
     }
 
-    protected function dropForeignKeys() {
+    protected function dropForeignKeys()
+    {
         MigrationHelper::dropForeignKeyIfExists('{{%translated_orders}}', ['userId'], $this);
     }
 }

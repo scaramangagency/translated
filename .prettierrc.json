@@ -1,0 +1,9 @@
+{
+    "tabWidth": 4,
+    "useTabs": false,
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 120,
+    "phpVersion": "7.4",
+    "trailingCommaPHP": false
+}

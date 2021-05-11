@@ -1,21 +1,132 @@
 {% requirePermission "translated:orders" %}
 
 {% extends "_layouts/cp" %}
-
-
-{% set title = "View Order" %}
-
+{% set title = order.title %}
 {% set selectedSubnavItem = 'orders' %}
 
 {% block actionButton %}
-    <a href="orders" class="btn">{{ "Cancel"|t('translated') }}</a>
+    {# TODO: Add time diff between order and now as quotes are only active for 24 hours #}
+    {% if orderPermissions and order.orderStatus == 1 and order.dateCreated|date('c') > date("-1 day")|date('c') %}
+        <div class="buttons">
+            <a href="/actions/orders/reject-quote?id={{ order.id }}" class="btn submit secondary">Reject Quote</a>
+            <a href="/actions/orders/approve-quote?id={{ order.id }}" class="btn submit">Approve Quote</a>
+        </div>
+    {% endif %}
+
+    {% if (requestQuote and order.orderStatus == 4) or (requestQuote and order.orderStatus == 1 and order.dateCreated|date('c') < date('-1 day')|date('c')) %}
+        <div class="buttons">
+            <a href="/actions/orders/refresh-quote?id={{ order.id }}" class="btn submit">Refresh Quote</a>
+        </div>
+    {% endif %}
+
+{% endblock %}
+
+{% block tabs %}
+    <nav id="tabs">
+        <ul>
+            {% if order.orderStatus == 2 or order.orderStatus == 3 %}
+                <li data-id="0">
+                    <a id="tab-0" class="tab" href="#tab-fulfilled" title="Fulfilled" aria-label="Fulfilled">Delivery</a>
+                </li>
+            {% endif %}
+            <li data-id="1">
+                <a id="tab-1" class="tab sel" href="#tab-information" title="Information" aria-label="Information">Order Information</a>
+            </li>
+        </ul>
+        <button type="button" id="overflow-tab-btn" data-icon="ellipsis" class="btn menubtn hidden"></button>
+        <div id="overflow-tab-menu" class="menu">
+            <ul role="listbox"></ul>
+        </div>
+    </nav>
 {% endblock %}
 
 {% set content %}
-    <h2>{{ "Orders CP Section body goes here"|t('translated') }}</h2>
-    <p class="textline"></p>
+    {% if order.orderStatus == 2 or order.orderStatus == 3 %}
+        <div id="tab-fulfilled" class="hidden">
+            <h2>dump fulfillment information</h2>
+        </div>
+    {% endif %}
+    <div id="tab-information">
+        <p>Source Language: {{ order.sourceLanguage }}</p>
+        <p>Target Language(s): {{ order.targetLanguage }}</p>
+        
+        <p>Content: {{ order.translationContent }}</p>
+        <p>Asset: {{ order.translationAsset }}</p>
+        <p>Notes: {{ order.translationNotes }}</p>
+        <p>Subject: {{ order.translationSubject }}</p>
+        <p>Word Count: {{ order.wordCount }}</p>
+    </div>
 {% endset %}
 
 {% set details %}
-    and some bits on the side
+
+    <div class="meta warning">
+        <div class="data">
+            <h3 class="heading">Total</h3>
+            <div class="value">{{ order.quoteTotal|currency('EUR') }}</div>
+        </div>
+        <hr>
+        <div class="data">
+            <h4 class="heading">Status</h4>
+
+            {# TODO: Add time diff between order and now as quotes are only active for 24 hours, so mark as expired #}
+            <div class="value">{{ statusFlag|raw }}</div>
+        </div>
+
+        <div class="data">
+            <h4 class="heading">Level</h4>
+            <div class="value">{{ serviceLevel|raw }}</div>
+        </div>
+        <div class="data">
+            <h4 class="heading">Delivery Date</h4>
+            <div class="value">{{ order.quoteDeliveryDate|date('short') }} {{ order.quoteDeliveryDate|time('short') }}</div>
+        </div>
+
+        {% if order.orderStatus == 2 %}
+            <hr>
+            <div class="data">
+                <h5 class="heading">Date Authorised</h5>
+                <div class="value">{{ order.dateApproved|date('short') }} {{ order.dateApproved|time('short') }}</div>
+            </div>
+            <div class="data">
+                <h5 class="heading">Authorised By</h5>
+                {% set authorisedBy = craft.users.id(order.authorisedBy).one() %}
+                <div class="value"><a href="/users/{{ authorisedBy.id }}">{{ authorisedBy.fullName }}</a></div>
+            </div>
+
+            {% if order.orderStatus == 3 %}
+                <hr>
+                <div class="data">
+                    <h5 class="heading">Date Fulfilled</h5>
+                    <div class="value">{{ order.dateFulfilled|date('short') }} {{ order.dateFulfilled|time('short') }}</div>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        {% if order.orderStatus == 4 %}
+            <hr>
+            <div class="data">
+                <h5 class="heading">Date Rejected</h5>
+                <div class="value">{{ order.dateRejected|date('short') }} {{ order.dateRejected|time('short') }}</div>
+            </div>
+            <div class="data">
+                <h5 class="heading">Rejected By</h5>
+                {% set authorisedBy = craft.users.id(order.authorisedBy).one() %}
+                <div class="value"><a href="/users/{{ authorisedBy.id }}">{{ authorisedBy.fullName }}</a></div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="meta read-only">
+        <div class="data">
+            <h5 class="heading">Date Ordered</h5>
+            <div class="value">{{ order.dateCreated|date('short') }} {{ order.dateCreated|time('short') }}</div>
+        </div>
+        <div class="data">
+            <h5 class="heading">Ordered By</h5>
+            {% set orderedBy = craft.users.id(order.userId).one() %}
+            <div class="value"><a href="/users/{{ orderedBy.id }}">{{ orderedBy.fullName }}</a></div>
+        </div>
+    </div>
+
 {% endset %}

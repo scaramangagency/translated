@@ -14,9 +14,9 @@ use craft\elements\User;
 class Order extends Element
 {
     const STATUS_PENDING = 1;
-	const STATUS_PROCESSING = 2;
-	const STATUS_DELIVERED = 3;
-	const STATUS_REJECTED = 4;
+    const STATUS_PROCESSING = 2;
+    const STATUS_DELIVERED = 3;
+    const STATUS_REJECTED = 4;
 
     // Public Properties
     // =========================================================================
@@ -27,7 +27,6 @@ class Order extends Element
     public $dateRejected;
     public $dateFulfilled;
     public $estimatedDeliveryDate;
-    public $dateOrdered;
     public $orderStatus = self::STATUS_PENDING;
 
     public $title;
@@ -54,24 +53,34 @@ class Order extends Element
 
     public function getCpEditUrl()
     {
-        return UrlHelper::cpUrl('translated/orders/view/'.$this->id);
+        return UrlHelper::cpUrl('translated/orders/view/' . $this->id);
     }
 
-    public static function refHandle() {
+    public static function refHandle()
+    {
         return 'order';
     }
 
-    public static function find(): ElementQueryInterface {
+    public static function find(): ElementQueryInterface
+    {
         return new OrderQuery(static::class);
     }
 
     protected static function defineSources(string $context = null): array
     {
         $sources = [
+            '*' => [
+                'key' => '*',
+                'label' => 'All Orders'
+            ],
             'orderStatus:1' => [
                 'key' => 'orderStatus:1',
-                'label' => 'Awaiting Authorisation',
-                'criteria' => ['status' => self::STATUS_PENDING]
+                'label' => 'Pending',
+                'criteria' => [
+                    'orderStatus' => self::STATUS_PENDING,
+                    'expired' => false,
+                    'checkExpired' => true
+                ]
             ],
             'orderStatus:2' => [
                 'key' => 'orderStatus:2',
@@ -87,17 +96,26 @@ class Order extends Element
                 'key' => 'orderStatus:4',
                 'label' => 'Rejected',
                 'criteria' => ['orderStatus' => self::STATUS_REJECTED]
+            ],
+            'orderStatus:5' => [
+                'key' => 'orderStatus:5',
+                'label' => 'Expired',
+                'criteria' => [
+                    'orderStatus' => self::STATUS_PENDING,
+                    'expired' => true,
+                    'checkExpired' => true
+                ]
             ]
         ];
 
         return $sources;
     }
 
-
     // Public Methods
     // -------------------------------------------------------------------------
 
-    public function datetimeAttributes(): array {
+    public function datetimeAttributes(): array
+    {
         $attributes = parent::datetimeAttributes();
         $attributes[] = 'dateApproved';
         $attributes[] = 'dateRejected';
@@ -107,7 +125,8 @@ class Order extends Element
         return $attributes;
     }
 
-    public function getUser() {
+    public function getUser()
+    {
         if ($this->userId !== null) {
             return Craft::$app->getUsers()->getUserById($this->userId);
         }
@@ -115,7 +134,8 @@ class Order extends Element
         return null;
     }
 
-    public function getAuthorisedBy() {
+    public function getAuthorisedBy()
+    {
         if ($this->authorisedBy !== null) {
             return Craft::$app->getUsers()->getUserById($this->authorisedBy);
         }
@@ -123,7 +143,8 @@ class Order extends Element
         return null;
     }
 
-    public function getEstimatedDeliveryDate() {
+    public function getEstimatedDeliveryDate()
+    {
         if ($this->quoteDeliveryDate !== null) {
             return $this->quoteDeliveryDate;
         }
@@ -131,15 +152,23 @@ class Order extends Element
         return null;
     }
 
-
-    public function getOwner() {
-       return $this->getUser()->fullName ?? '';
+    public function getOwner()
+    {
+        return $this->getUser()->fullName ?? '';
     }
 
-    public function getStatus() {
+    public function getStatus()
+    {
         switch ($this->orderStatus) {
             case 1:
-                $status = 'Pending';
+                $dd = new \DateTime();
+                $dd->modify('-1 day');
+
+                if ($this->dateCreated->format('c') > $dd->format('c')) {
+                    $status = 'Pending';
+                } else {
+                    $status = 'Expired';
+                }
                 break;
             case 2:
                 $status = 'Processing';
@@ -151,17 +180,19 @@ class Order extends Element
                 $status = 'Rejected';
                 break;
         }
-        return '<span class="label order-status ' . strtolower($status) .'">'. $status .'</span>';
+        return '<span class="label order-status ' . strtolower($status) . '">' . $status . '</span>';
     }
 
-    public function getAuthoriser() {
+    public function getAuthoriser()
+    {
         return $this->getAuthorisedBy()->fullName ?? '';
     }
 
     // Element index methods
     // -------------------------------------------------------------------------
 
-    protected static function defineTableAttributes(): array {
+    protected static function defineTableAttributes(): array
+    {
         return [
             'title' => ['label' => 'Title'],
             'orderStatus' => ['label' => 'Status'],
@@ -175,11 +206,22 @@ class Order extends Element
         ];
     }
 
-    protected static function defineDefaultTableAttributes(string $source): array {
-        return ['title', 'orderStatus', 'estimatedDeliveryDate', 'ownedBy', 'authorisedBy', 'dateApproved', 'dateRejected', 'dateFulfilled'];
+    protected static function defineDefaultTableAttributes(string $source): array
+    {
+        return [
+            'title',
+            'orderStatus',
+            'estimatedDeliveryDate',
+            'ownedBy',
+            'authorisedBy',
+            'dateApproved',
+            'dateRejected',
+            'dateFulfilled'
+        ];
     }
 
-    protected static function defineSortOptions(): array {
+    protected static function defineSortOptions(): array
+    {
         return [
             'title' => 'Title',
             'dateApproved' => 'Approval date',
@@ -187,31 +229,25 @@ class Order extends Element
         ];
     }
 
-    protected function tableAttributeHtml(string $attribute): string {
+    protected function tableAttributeHtml(string $attribute): string
+    {
         switch ($attribute) {
-            case 'title': {
+            case 'title':
                 return $this->title;
-            }
-            case 'ownedBy': {
+            case 'ownedBy':
                 return $this->getOwner() ?: '';
-            }
-            case 'authorisedBy': {
-               return $this->getAuthoriser() ?: '';
-            }
-            case 'orderStatus': {
+            case 'authorisedBy':
+                return $this->getAuthoriser() ?: '';
+            case 'orderStatus':
                 return $this->getStatus();
-            }
-            case 'estimatedDeliveryDate': {
+            case 'estimatedDeliveryDate':
                 return $this->getEstimatedDeliveryDate();
-            }
             case 'dateApproved':
-            case 'dateRejected': 
-            case 'dateFulfilled': {
-                return ($this->$attribute) ? parent::tableAttributeHtml($attribute) : '-';
-            }
-            default: {
+            case 'dateRejected':
+            case 'dateFulfilled':
+                return $this->$attribute ? parent::tableAttributeHtml($attribute) : '-';
+            default:
                 return parent::tableAttributeHtml($attribute);
-            }
         }
     }
 }

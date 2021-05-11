@@ -4,7 +4,9 @@
 {% set elementType = 'scaramangagency\\translated\\elements\\Order' %}
 
 {% block actionButton %}
-    <a href="orders/new" class="btn submit add icon">{{ "Place new order"|t('translated') }}</a>
+    {% if requestQuote %}
+        <a href="orders/new" class="btn submit add icon">{{ "Place new order"|t('translated') }}</a>
+    {% endif %}
 {% endblock %}
 
 
