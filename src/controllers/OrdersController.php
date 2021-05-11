@@ -43,7 +43,7 @@ class OrdersController extends Controller
         $settings = Translated::$plugin->getSettings();
 
         if (!$settings['translatedUsername'] || !$settings['translatedPassword']) {
-            return Craft::$app->response->redirect(UrlHelper::cpUrl('translated/settings'))->send();
+            return $this->redirect(UrlHelper::cpUrl('translated/settings'));
         }
 
         $user = Craft::$app->getUser();
@@ -56,12 +56,21 @@ class OrdersController extends Controller
         ]);
     }
 
-    public function actionNewOrder()
+    public function actionNewQuote($id = null)
     {
         $settings = Translated::$plugin->getSettings();
 
         if (!$settings['translatedUsername'] || !$settings['translatedPassword']) {
-            return Craft::$app->response->redirect(UrlHelper::cpUrl('translated/settings'))->send();
+            return $this->redirect(UrlHelper::cpUrl('translated/settings'));
+        }
+
+        if ($id) {
+            $data = Translated::$plugin->orderService->getOrder($id);
+
+            if (!$data) {
+                Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get quote to duplicate'));
+                return $this->redirect(UrlHelper::cpUrl('translated/orders'));
+            }
         }
 
         $availableLanguages = Translated::$plugin->utilityService->fetchAvailableLanguages($settings);
@@ -72,7 +81,8 @@ class OrdersController extends Controller
             'availableSubjects' => $availableSubjects,
             'elementType' => Asset::class,
             'selectedSource' => $availableLanguages['selectedSource'],
-            'selectedTarget' => $availableLanguages['selectedTarget']
+            'selectedTarget' => $availableLanguages['selectedTarget'],
+            'data' => $data ?? null
         ]);
     }
 
@@ -81,11 +91,8 @@ class OrdersController extends Controller
         $order = Translated::$plugin->orderService->getOrder($id);
 
         if (!$order) {
-            LogToFile::error('Could not get order record', 'translated');
-
-            Craft::$app->getSession()->setError(Craft::t('app', 'An order does not exist with that ID.'));
-
-            return Craft::$app->response->redirect(UrlHelper::cpUrl('translated/order'))->send();
+            Craft::$app->getSession()->setError(Craft::t('app', 'An order does not exist with that ID'));
+            return $this->redirect(UrlHelper::cpUrl('translated/orders'));
         }
 
         $user = Craft::$app->getUser();
@@ -101,7 +108,7 @@ class OrdersController extends Controller
                 $dd = new \DateTime();
                 $dd->modify('-1 day');
 
-                $dt = new \DateTime(strtotime($order->dateCreated));
+                $dt = new \DateTime($order->dateCreated);
 
                 if ($dt->format('c') > $dd->format('c')) {
                     $status = 'Pending';
@@ -144,17 +151,9 @@ class OrdersController extends Controller
     public function actionRequestQuote()
     {
         $data = Craft::$app->getRequest()->getBodyParam('order', []);
-        $getQuote = Translated::$plugin->orderService->getQuote($data);
+        $quoteId = Translated::$plugin->orderService->handleQuote($data);
 
-        return Craft::$app->response->redirect(UrlHelper::cpUrl('translated/orders'))->send();
-    }
-
-    public function actionRejectQuote()
-    {
-        $data = Craft::$app->getRequest()->getBodyParam('order', []);
-        $getQuote = Translated::$plugin->orderService->rejectQuote($data);
-
-        return Craft::$app->response->redirect(UrlHelper::cpUrl('translated/orders'))->send();
+        return $this->redirect(UrlHelper::cpUrl('translated/orders/view/' . $quoteId));
     }
 
     public function actionApproveQuote()
@@ -162,11 +161,39 @@ class OrdersController extends Controller
         $data = Craft::$app->getRequest()->getBodyParam('order', []);
         $getQuote = Translated::$plugin->orderService->approveQuote($data);
 
-        return Craft::$app->response->redirect(UrlHelper::cpUrl('translated/orders'))->send();
+        Craft::$app->getSession()->setNotice(Craft::t('app', 'Quote converted to order'));
+        return $this->redirect(UrlHelper::cpUrl('translated/orders'));
+    }
+
+    public function actionRefreshQuote($id)
+    {
+        $getQuote = Translated::$plugin->orderService->handleQuote(null, $id);
+
+        if (!$getQuote) {
+            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to refresh quote'));
+            return $this->redirect(UrlHelper::cpUrl('translated/orders'));
+        }
+
+        Craft::$app->getSession()->setNotice(Craft::t('app', 'Quote successfully refreshed'));
+        return $this->redirect(UrlHelper::cpUrl('translated/orders/view/' . $id));
+    }
+
+    public function actionRejectQuote($id)
+    {
+        $rejectQuote = Translated::$plugin->orderService->rejectQuote($id);
+
+        if (!$rejectQuote) {
+            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to reject quote'));
+            return $this->redirect(UrlHelper::cpUrl('translated/orders'));
+        }
+
+        Craft::$app->getSession()->setNotice(Craft::t('app', 'Quote successfully rejected'));
+        return $this->redirect(UrlHelper::cpUrl('translated/orders'));
     }
 
     public function actionHandleDelivery()
     {
+        /** Do stuff that marks the order as completed and adds the translated text */
         return true;
     }
 }

@@ -1,0 +1,60 @@
+/**
+ * translated plugin for Craft CMS
+ *
+ * translated CSS
+ *
+ * @author    Scaramanga Agency
+ * @copyright Copyright (c) 2021 Scaramanga Agency
+ * @link      https://scaramanga.agency
+ * @package   Translated
+ * @since     1.0.0
+ */
+.btn.tertiary {
+    border: 1px solid #b7252f;
+    color: #b7252f;
+    background-color: transparent;
+}
+
+.btn.tertiary:hover {
+    border-color: transparent;
+    color: #3f4d5a;
+}
+
+.label.order-status,
+.label.order-service {
+    border: none;
+    color: #212121;
+    padding: 4px 12px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 4px;
+}
+
+.label.professional {
+    background-color: #daa520;
+}
+.label.premium {
+    background-color: #dcdcdc;
+}
+.label.economy {
+    background-color: #8b4513;
+    color: white;
+}
+
+.label.pending {
+    background-color: #e4e2e0;
+}
+.label.processing {
+    background-color: #0071bc;
+    color: white;
+}
+.label.delivered {
+    background-color: #2e8540;
+    color: white;
+}
+.label.rejected,
+.label.expired {
+    background-color: #dc143c;
+    color: white;
+}

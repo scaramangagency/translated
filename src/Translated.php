@@ -90,7 +90,10 @@ class Translated extends Plugin
     public function afterSaveSettings()
     {
         parent::afterSaveSettings();
-        Craft::$app->response->redirect(UrlHelper::cpUrl('translated/settings'))->send();
+        Craft::$app
+            ->getResponse()
+            ->redirect(UrlHelper::cpUrl('translated/settings'))
+            ->send();
     }
 
     public function getSettingsResponse()
@@ -128,7 +131,8 @@ class Translated extends Plugin
                 'translated/settings' => 'translated/settings/index',
 
                 'translated/orders' => 'translated/orders/index',
-                'translated/orders/new' => 'translated/orders/new-order',
+                'translated/orders/new' => 'translated/orders/new-quote',
+                'translated/orders/duplicate/<id>' => 'translated/orders/new-quote',
                 'translated/orders/view/<id>' => 'translated/orders/view-order'
             ]);
         });

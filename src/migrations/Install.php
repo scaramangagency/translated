@@ -3,6 +3,7 @@
 namespace scaramangagency\translated\migrations;
 
 use scaramangagency\translated\Translated;
+use scaramangagency\translated\elements\Order;
 
 use Craft;
 use craft\config\DbConfig;
@@ -15,12 +16,18 @@ class Install extends Migration
     {
         $this->createTables();
         $this->addForeignKeys();
+
+        return true;
     }
 
     public function safeDown()
     {
         $this->dropForeignKeys();
         $this->dropTables();
+        $this->removeContent();
+        $this->dropProjectConfig();
+
+        return true;
     }
 
     protected function createTables()
@@ -33,10 +40,12 @@ class Install extends Migration
 
             $this->createTable('{{%translated_orders}}', [
                 'id' => $this->primaryKey(),
+                'elementId' => $this->integer()->notNull(),
+                'siteId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'userId' => $this->integer(),
-                'authorisedBy' => $this->integer(),
+                'reviewedBy' => $this->integer(),
                 'dateCreated' => $this->dateTime(),
                 'dateApproved' => $this->dateTime(),
                 'dateRejected' => $this->dateTime(),
@@ -51,11 +60,13 @@ class Install extends Migration
                 'translationSubject' => $this->text(),
                 'translationLevel' => $this->string(20),
                 'wordCount' => $this->integer(),
-                'title' => $this->text(),
+                'projectTitle' => $this->text(),
 
                 'quoteDeliveryDate' => $this->dateTime(),
                 'quoteTotal' => $this->float(),
                 'quotePID' => $this->integer(),
+
+                'translatedContent' => $this->text(),
 
                 'uid' => $this->uid()
             ]);
@@ -66,15 +77,9 @@ class Install extends Migration
 
     protected function addForeignKeys()
     {
-        $this->addForeignKey(
-            $this->db->getForeignKeyName('{{%translated_orders}}', 'userId'),
-            '{{%translated_orders}}',
-            'userId',
-            '{{%users}}',
-            'id',
-            'CASCADE',
-            null
-        );
+        $this->addForeignKey(null, '{{%translated_orders}}', 'userId', '{{%users}}', 'id', 'CASCADE', null);
+        $this->addForeignKey(null, '{{%translated_orders}}', ['elementId'], '{{%elements}}', ['id'], 'CASCADE', null);
+        $this->addForeignKey(null, '{{%translated_orders}}', ['siteId'], '{{%sites}}', ['id'], 'CASCADE', 'CASCADE');
     }
 
     protected function dropTables()
@@ -85,5 +90,16 @@ class Install extends Migration
     protected function dropForeignKeys()
     {
         MigrationHelper::dropForeignKeyIfExists('{{%translated_orders}}', ['userId'], $this);
+        MigrationHelper::dropForeignKeyIfExists('{{%translated_orders}}', ['id'], $this);
+    }
+
+    protected function removeContent()
+    {
+        $this->delete('{{%elements}}', ['type' => Order::class]);
+    }
+
+    protected function dropProjectConfig()
+    {
+        Craft::$app->projectConfig->remove('translated');
     }
 }

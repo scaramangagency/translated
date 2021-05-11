@@ -2,11 +2,11 @@
 
 {% extends "_layouts/cp" %}
 {% import "_includes/forms" as forms %}
-{% set title = "Place Order" %}
+{% set title = "Request Quote" %}
 {% set selectedSubnavItem = 'orders' %}
 
 {% block actionButton %}
-    <a href="orders" class="btn">{{ "Cancel"|t('translated') }}</a>
+    <a href="{{ cpUrl('translated/orders') }}" class="btn">{{ "Cancel"|t('translated') }}</a>
 {% endblock %}
 
 {% set content %}
@@ -24,8 +24,8 @@
                     label: 'Project Name',
                     instructions: 'Add a title to this translation quote',
                     id: 'title',
-                    name: 'title',
-                    required: 'required',
+                    name: 'projectTitle',
+                    required: 'required'
                 }) }}
 
                 Economy: Machine Translation with Light human review. Cheapest.
@@ -41,7 +41,7 @@
                         'R': 'Premium',
                         'P': 'Economy'
                     },
-                    value: 'economy'
+                    value: data['translationLevel'] ?? 'economy'
                 }) }}
 
                 {{ forms.selectField({
@@ -51,8 +51,12 @@
                     name: 'sourceLanguage',
                     required: 'required',
                     options: availableLanguages,
-                    value: selectedSource ?? 'English'
+                    value: data['sourceLanguage'] ?? selectedSource ?? 'English'
                 }) }}
+
+                {% if data %}
+                    {% set selectedValues = data['targetLanguage']|json_decode %}
+                {% endif %}
 
                 {{ forms.multiSelectField({
                     label: 'Target Language',
@@ -62,7 +66,7 @@
                     required: 'required',
                     multiple: 'multiple',
                     options: availableLanguages,
-                    value: selectedTarget ?? ''
+                    values: selectedValues ?? selectedTarget ?? ''
                 }) }}
 
                 {{ forms.selectField({
@@ -71,7 +75,7 @@
                     id: 'translationSubject',
                     name: 'translationSubject',
                     options: availableSubjects,
-                    value: 'general'
+                    value: data['translationSubject'] ?? 'general'
                 }) }}
 
                 {{ forms.textareaField({
@@ -79,6 +83,7 @@
                     id: 'translationContent',
                     name: 'translationContent',
                     required: 'required',
+                    value: data['translationContent'] ?? ''
                 }) }}
 
                 OR
@@ -95,7 +100,8 @@
                     selectionLabel: "Select file to translate",
                     sources: [],
                     limit: 1,
-                    warning: false
+                    warning: false,
+                    value: data['translationAsset'] ?? null
                 }) }}
 
                 {{ forms.textField({
@@ -103,13 +109,15 @@
                     id: 'wordCount',
                     name: 'wordCount',
                     required: 'required',
+                    value: data['wordCount'] ?? ''
                 }) }}
 
                 {{ forms.textareaField({
                     label: 'Notes',
                     id: 'translationNotes',
                     name: 'translationNotes',
-                    required: 'required'
+                    required: 'required',
+                    value: data['translationNotes'] ?? ''
                 }) }}
 
                 <input type="hidden" id="userId" name="userId" value="{{ currentUser.id }}" />

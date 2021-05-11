@@ -44,7 +44,10 @@ class UtilityService extends Component
             $res = curl_exec($ch);
             curl_close($ch);
         } catch (Exception $e) {
-            LogToFile::error('Failed to fetch available languages from translated API', 'translated');
+            LogToFile::error(
+                '[Utility][Languages] Failed to fetch available languages from translated API',
+                'translated'
+            );
             return false;
         }
 
@@ -52,7 +55,8 @@ class UtilityService extends Component
 
         if ($res->code == 0) {
             LogToFile::error(
-                'translated API returned an error when fetching languages. Error: ' . $res->message,
+                '[Utility][Languages] translated API returned an error when fetching languages. Error: ' .
+                    $res->message,
                 'translated'
             );
             return false;
@@ -112,7 +116,10 @@ class UtilityService extends Component
             $res = curl_exec($ch);
             curl_close($ch);
         } catch (Exception $e) {
-            LogToFile::error('Failed to fetch available subjects from translated API', 'translated');
+            LogToFile::error(
+                '[Utility][Subjects] Failed to fetch available subjects from translated API',
+                'translated'
+            );
             return false;
         }
 
@@ -120,7 +127,7 @@ class UtilityService extends Component
 
         if ($res->code == 0) {
             LogToFile::error(
-                'translated API returned an error when fetching subjects. Error: ' . $res->message,
+                '[Utility][Subjects] translated API returned an error when fetching subjects. Error: ' . $res->message,
                 'translated'
             );
             return false;

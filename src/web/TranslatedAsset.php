@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2021 Scaramanga Agency
  */
 
-namespace scaramangagency\translated\assetbundles\translated;
+namespace scaramangagency\translated\web;
 
 use Craft;
 use craft\web\AssetBundle;
@@ -29,19 +29,11 @@ class TranslatedAsset extends AssetBundle
      */
     public function init()
     {
-        $this->sourcePath = "@scaramangagency/translated/assetbundles/translated/dist";
+        $this->sourcePath = '@scaramangagency/translated/web/dist';
 
-        $this->depends = [
-            CpAsset::class,
-        ];
+        $this->depends = [CpAsset::class];
 
-        $this->js = [
-            'js/Translated.js',
-        ];
-
-        $this->css = [
-            'css/Translated.css',
-        ];
+        $this->css = ['css/Translated.css'];
 
         parent::init();
     }

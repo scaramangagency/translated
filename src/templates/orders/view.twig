@@ -3,22 +3,22 @@
 {% extends "_layouts/cp" %}
 {% set title = order.title %}
 {% set selectedSubnavItem = 'orders' %}
+{% do view.registerAssetBundle('scaramangagency\\translated\\web\\TranslatedAsset') %}
+
 
 {% block actionButton %}
-    {# TODO: Add time diff between order and now as quotes are only active for 24 hours #}
-    {% if orderPermissions and order.orderStatus == 1 and order.dateCreated|date('c') > date("-1 day")|date('c') %}
-        <div class="buttons">
-            <a href="/actions/orders/reject-quote?id={{ order.id }}" class="btn submit secondary">Reject Quote</a>
-            <a href="/actions/orders/approve-quote?id={{ order.id }}" class="btn submit">Approve Quote</a>
-        </div>
-    {% endif %}
+    <div class="buttons">
+        <a href="{{ cpUrl('translated/orders/duplicate/' ~ order.id) }}" class="btn tertiary">Duplicate Quote</a>
 
-    {% if (requestQuote and order.orderStatus == 4) or (requestQuote and order.orderStatus == 1 and order.dateCreated|date('c') < date('-1 day')|date('c')) %}
-        <div class="buttons">
-            <a href="/actions/orders/refresh-quote?id={{ order.id }}" class="btn submit">Refresh Quote</a>
-        </div>
-    {% endif %}
+        {% if orderPermissions and order.orderStatus == 1 and order.dateCreated|date('c') > date("-1 day")|date('c') %}
+            <a href="{{ actionUrl('translated/orders/reject-quote?id=' ~ order.id) }}" class="btn submit secondary">Reject Quote</a>
+            <a href="{{ actionUrl('translated/orders/approve-quote?id=' ~ order.id) }}" class="btn submit">Approve Quote</a>
+        {% endif %}
 
+        {% if (requestQuote and order.orderStatus == 1 and order.dateCreated|date('c') < date('-1 day')|date('c')) %}
+            <a href="{{ actionUrl('translated/orders/refresh-quote?id=' ~ order.id) }}" class="btn submit">Refresh Quote</a>
+        {% endif %}
+    </div>
 {% endblock %}
 
 {% block tabs %}
@@ -89,9 +89,9 @@
                 <div class="value">{{ order.dateApproved|date('short') }} {{ order.dateApproved|time('short') }}</div>
             </div>
             <div class="data">
-                <h5 class="heading">Authorised By</h5>
-                {% set authorisedBy = craft.users.id(order.authorisedBy).one() %}
-                <div class="value"><a href="/users/{{ authorisedBy.id }}">{{ authorisedBy.fullName }}</a></div>
+                <h5 class="heading">Reviewed By</h5>
+                {% set reviewedBy = craft.users.id(order.reviewedBy).one() %}
+                <div class="value"><a href="{{ cpUrl('users/' ~ reviewedBy.id) }}">{{ reviewedBy.fullName }}</a></div>
             </div>
 
             {% if order.orderStatus == 3 %}
@@ -111,21 +111,21 @@
             </div>
             <div class="data">
                 <h5 class="heading">Rejected By</h5>
-                {% set authorisedBy = craft.users.id(order.authorisedBy).one() %}
-                <div class="value"><a href="/users/{{ authorisedBy.id }}">{{ authorisedBy.fullName }}</a></div>
+                {% set reviewedBy = craft.users.id(order.reviewedBy).one() %}
+                <div class="value"><a href="{{ cpUrl('users/' ~ reviewedBy.id) }}">{{ reviewedBy.fullName }}</a></div>
             </div>
         {% endif %}
     </div>
 
     <div class="meta read-only">
         <div class="data">
-            <h5 class="heading">Date Ordered</h5>
+            <h5 class="heading">Quote Date</h5>
             <div class="value">{{ order.dateCreated|date('short') }} {{ order.dateCreated|time('short') }}</div>
         </div>
         <div class="data">
-            <h5 class="heading">Ordered By</h5>
+            <h5 class="heading">Requested By</h5>
             {% set orderedBy = craft.users.id(order.userId).one() %}
-            <div class="value"><a href="/users/{{ orderedBy.id }}">{{ orderedBy.fullName }}</a></div>
+            <div class="value"><a href="{{ cpUrl('users/' ~ orderedBy.id) }}">{{ orderedBy.fullName }}</a></div>
         </div>
     </div>
 

@@ -20,16 +20,18 @@ class Order extends Element
 
     // Public Properties
     // =========================================================================
+    public $elementId;
+    public $siteId;
 
     public $userId;
-    public $authorisedBy;
+    public $reviewedBy;
     public $dateApproved;
     public $dateRejected;
     public $dateFulfilled;
     public $estimatedDeliveryDate;
     public $orderStatus = self::STATUS_PENDING;
 
-    public $title;
+    public $projectTitle;
     public $sourceLanguage;
     public $targetLanguage;
     public $translationContent;
@@ -42,6 +44,8 @@ class Order extends Element
     public $quoteDeliveryDate;
     public $quoteTotal;
     public $quotePID;
+
+    public $translatedContent;
 
     // Static Methods
     // =========================================================================
@@ -61,6 +65,16 @@ class Order extends Element
         return 'order';
     }
 
+    public static function hasContent(): bool
+    {
+        return true;
+    }
+
+    public static function hasTitles(): bool
+    {
+        return false;
+    }
+
     public static function find(): ElementQueryInterface
     {
         return new OrderQuery(static::class);
@@ -70,10 +84,12 @@ class Order extends Element
     {
         $sources = [
             '*' => [
+                'defaultSort' => ['translated_orders.dateCreated', 'desc'],
                 'key' => '*',
                 'label' => 'All Orders'
             ],
             'orderStatus:1' => [
+                'defaultSort' => ['translated_orders.dateCreated', 'desc'],
                 'key' => 'orderStatus:1',
                 'label' => 'Pending',
                 'criteria' => [
@@ -83,21 +99,25 @@ class Order extends Element
                 ]
             ],
             'orderStatus:2' => [
+                'defaultSort' => ['translated_orders.dateCreated', 'desc'],
                 'key' => 'orderStatus:2',
                 'label' => 'In Process',
                 'criteria' => ['orderStatus' => self::STATUS_PROCESSING]
             ],
             'orderStatus:3' => [
+                'defaultSort' => ['translated_orders.dateCreated', 'desc'],
                 'key' => 'orderStatus:3',
                 'label' => 'Completed',
                 'criteria' => ['orderStatus' => self::STATUS_DELIVERED]
             ],
             'orderStatus:4' => [
+                'defaultSort' => ['translated_orders.dateCreated', 'desc'],
                 'key' => 'orderStatus:4',
                 'label' => 'Rejected',
                 'criteria' => ['orderStatus' => self::STATUS_REJECTED]
             ],
             'orderStatus:5' => [
+                'defaultSort' => ['translated_orders.dateCreated', 'desc'],
                 'key' => 'orderStatus:5',
                 'label' => 'Expired',
                 'criteria' => [
@@ -134,10 +154,10 @@ class Order extends Element
         return null;
     }
 
-    public function getAuthorisedBy()
+    public function getReviewedBy()
     {
-        if ($this->authorisedBy !== null) {
-            return Craft::$app->getUsers()->getUserById($this->authorisedBy);
+        if ($this->reviewedBy !== null) {
+            return Craft::$app->getUsers()->getUserById($this->reviewedBy);
         }
 
         return null;
@@ -179,13 +199,21 @@ class Order extends Element
             case 4:
                 $status = 'Rejected';
                 break;
+            default:
+                $status = 'Pending';
+                break;
         }
         return '<span class="label order-status ' . strtolower($status) . '">' . $status . '</span>';
     }
 
-    public function getAuthoriser()
+    public function getReviewer()
     {
-        return $this->getAuthorisedBy()->fullName ?? '';
+        return $this->getReviewedBy()->fullName ?? '';
+    }
+
+    public function getContentTable(): string
+    {
+        return '{{%translated_orders}}';
     }
 
     // Element index methods
@@ -194,50 +222,72 @@ class Order extends Element
     protected static function defineTableAttributes(): array
     {
         return [
-            'title' => ['label' => 'Title'],
+            'projectTitle' => ['label' => 'Title'],
+            'dateCreated' => ['label' => 'Requested on'],
             'orderStatus' => ['label' => 'Status'],
-            'estimatedDeliveryDate' => ['label' => 'Estimated delivery date'],
-            'ownedBy' => ['label' => 'Placed By'],
-            'authorisedBy' => ['label' => 'Authorised By'],
-            'rejectedBy' => ['label' => 'Rejected By'],
-            'dateApproved' => ['label' => 'Approval date'],
-            'dateRejected' => ['label' => 'Rejection date'],
-            'dateFulfilled' => ['label' => 'Fulfilment date']
+            'quoteTotal' => ['label' => 'Quote total'],
+            'estimatedDeliveryDate' => ['label' => 'Delivery date'],
+            'ownedBy' => ['label' => 'Requested by'],
+            'reviewedBy' => ['label' => 'Reviewed by'],
+            'rejectedBy' => ['label' => 'Rejected by'],
+            'dateApproved' => ['label' => 'Approved on'],
+            'dateRejected' => ['label' => 'Rejected on'],
+            'dateFulfilled' => ['label' => 'Fulfilled on']
         ];
     }
 
     protected static function defineDefaultTableAttributes(string $source): array
     {
-        return [
-            'title',
-            'orderStatus',
-            'estimatedDeliveryDate',
-            'ownedBy',
-            'authorisedBy',
-            'dateApproved',
-            'dateRejected',
-            'dateFulfilled'
-        ];
+        $attributes = [];
+        $attributes[] = 'projectTitle';
+        $attributes[] = 'dateCreated';
+        $attributes[] = 'orderStatus';
+        $attributes[] = 'ownedBy';
+
+        if ($source == 'orderStatus:1') {
+            $attributes[] = 'quoteTotal';
+            $attributes[] = 'estimatedDeliveryDate';
+        }
+
+        if ($source == 'orderStatus:2' || $source == 'orderStatus:3') {
+            $attributes[] = 'reviewedBy';
+            $attributes[] = 'dateApproved';
+        }
+
+        if ($source == 'orderStatus:3') {
+            $attributes[] = 'dateFulfilled';
+        }
+
+        if ($source == 'orderStatus:4') {
+            $attributes[] = 'reviewedBy';
+            $attributes[] = 'dateRejected';
+        }
+
+        return $attributes;
+    }
+
+    protected static function defineSearchableAttributes(): array
+    {
+        return ['projectTitle'];
     }
 
     protected static function defineSortOptions(): array
     {
         return [
-            'title' => 'Title',
-            'dateApproved' => 'Approval date',
-            'dateFulfilled' => 'Fulfilment date'
+            'projectTitle' => 'Title',
+            'dateCreated' => 'Requested on'
         ];
     }
 
     protected function tableAttributeHtml(string $attribute): string
     {
         switch ($attribute) {
-            case 'title':
-                return $this->title;
+            case 'projectTitle':
+                return $this->projectTitle;
             case 'ownedBy':
                 return $this->getOwner() ?: '';
-            case 'authorisedBy':
-                return $this->getAuthoriser() ?: '';
+            case 'reviewedBy':
+                return $this->getReviewer() ?: '';
             case 'orderStatus':
                 return $this->getStatus();
             case 'estimatedDeliveryDate':

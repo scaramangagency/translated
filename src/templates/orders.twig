@@ -2,10 +2,11 @@
 
 {% extends "_layouts/elementindex" %}
 {% set elementType = 'scaramangagency\\translated\\elements\\Order' %}
+{% do view.registerAssetBundle('scaramangagency\\translated\\web\\TranslatedAsset') %}
 
 {% block actionButton %}
     {% if requestQuote %}
-        <a href="orders/new" class="btn submit add icon">{{ "Place new order"|t('translated') }}</a>
+        <a href="{{ cpUrl('translated/orders/new') }}" class="btn submit add icon">{{ "Place new order"|t('translated') }}</a>
     {% endif %}
 {% endblock %}
 
