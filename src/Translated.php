@@ -40,6 +40,7 @@ class Translated extends Plugin
         self::$plugin = $this;
 
         $this->registerCpUrls();
+        $this->registerSiteUrls();
         $this->registerPermissions();
         $this->registerElementType();
 
@@ -143,7 +144,7 @@ class Translated extends Plugin
         Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_SITE_URL_RULES, function (
             RegisterUrlRulesEvent $event
         ) {
-            $event->rules['translatedApi'] = 'translated/orders/handleDelivery';
+            $event->rules['translated/accept'] = 'translated/orders/webhook';
         });
     }
 

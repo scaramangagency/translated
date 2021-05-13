@@ -2,7 +2,9 @@
 namespace scaramangagency\translated\elements;
 
 use scaramangagency\translated\Translated;
+use scaramangagency\translated\elements\actions\DeleteAction;
 use scaramangagency\translated\elements\db\OrderQuery;
+use scaramangagency\translated\records\OrderRecord as OrderRecord;
 
 use Craft;
 use craft\base\Element;
@@ -17,12 +19,10 @@ class Order extends Element
     const STATUS_PROCESSING = 2;
     const STATUS_DELIVERED = 3;
     const STATUS_REJECTED = 4;
+    const STATUS_FAILED = 5;
 
     // Public Properties
     // =========================================================================
-    public $elementId;
-    public $siteId;
-
     public $userId;
     public $reviewedBy;
     public $dateApproved;
@@ -31,7 +31,7 @@ class Order extends Element
     public $estimatedDeliveryDate;
     public $orderStatus = self::STATUS_PENDING;
 
-    public $projectTitle;
+    public $title;
     public $sourceLanguage;
     public $targetLanguage;
     public $translationContent;
@@ -52,7 +52,7 @@ class Order extends Element
 
     public static function displayName(): string
     {
-        return 'translated Order';
+        return 'order';
     }
 
     public function getCpEditUrl()
@@ -67,10 +67,10 @@ class Order extends Element
 
     public static function hasContent(): bool
     {
-        return true;
+        return false;
     }
 
-    public static function hasTitles(): bool
+    public static function hasStatuses(): bool
     {
         return false;
     }
@@ -108,7 +108,7 @@ class Order extends Element
                 'defaultSort' => ['translated_orders.dateCreated', 'desc'],
                 'key' => 'orderStatus:3',
                 'label' => 'Completed',
-                'criteria' => ['orderStatus' => self::STATUS_DELIVERED]
+                'criteria' => ['orderStatus' => [self::STATUS_DELIVERED, self::STATUS_FAILED]]
             ],
             'orderStatus:4' => [
                 'defaultSort' => ['translated_orders.dateCreated', 'desc'],
@@ -129,6 +129,21 @@ class Order extends Element
         ];
 
         return $sources;
+    }
+
+    protected static function defineActions(string $source = null): array
+    {
+        $elementsService = Craft::$app->getElements();
+
+        $actions = parent::defineActions($source);
+
+        $actions[] = $elementsService->createAction([
+            'type' => DeleteAction::class,
+            'confirmationMessage' => 'Are you sure you want to delete the selected orders?',
+            'successMessage' => 'Orders deleted.'
+        ]);
+
+        return $actions;
     }
 
     // Public Methods
@@ -211,9 +226,48 @@ class Order extends Element
         return $this->getReviewedBy()->fullName ?? '';
     }
 
-    public function getContentTable(): string
+    // public function getContentTable(): string
+    // {
+    //     return '{{%translated_orders}}';
+    // }
+
+    public function afterSave(bool $isNew)
     {
-        return '{{%translated_orders}}';
+        if (!$isNew) {
+            $record = OrderRecord::findOne($this->id);
+
+            if (!$record) {
+                throw new Exception('Invalid order ID: ' . $this->id);
+            }
+
+            $dt = new \DateTime();
+            $record->dateCreated = $dt;
+        } else {
+            $record = new OrderRecord();
+            $record->id = $this->id;
+        }
+
+        $record->sourceLanguage = $this->sourceLanguage;
+        $record->targetLanguage = $this->targetLanguage;
+        $record->title = $this->title;
+        $record->translationLevel = $this->translationLevel;
+        $record->wordCount = $this->wordCount;
+        $record->translationSubject = $this->translationSubject;
+        $record->translationNotes = $this->translationNotes;
+        $record->userId = $this->userId;
+        $record->orderStatus = $this->orderStatus;
+
+        if ($this->translationAsset) {
+            $record->translationAsset = $this->translationAsset;
+        } else {
+            $record->translationContent = $this->translationContent;
+        }
+
+        $record->save(false);
+
+        $this->id = $record->id;
+
+        parent::afterSave($isNew);
     }
 
     // Element index methods
@@ -222,7 +276,7 @@ class Order extends Element
     protected static function defineTableAttributes(): array
     {
         return [
-            'projectTitle' => ['label' => 'Title'],
+            'title' => ['label' => 'Title'],
             'dateCreated' => ['label' => 'Requested on'],
             'orderStatus' => ['label' => 'Status'],
             'quoteTotal' => ['label' => 'Quote total'],
@@ -239,7 +293,7 @@ class Order extends Element
     protected static function defineDefaultTableAttributes(string $source): array
     {
         $attributes = [];
-        $attributes[] = 'projectTitle';
+        $attributes[] = 'title';
         $attributes[] = 'dateCreated';
         $attributes[] = 'orderStatus';
         $attributes[] = 'ownedBy';
@@ -268,13 +322,13 @@ class Order extends Element
 
     protected static function defineSearchableAttributes(): array
     {
-        return ['projectTitle'];
+        return ['title'];
     }
 
     protected static function defineSortOptions(): array
     {
         return [
-            'projectTitle' => 'Title',
+            'title' => 'Title',
             'dateCreated' => 'Requested on'
         ];
     }
@@ -282,8 +336,8 @@ class Order extends Element
     protected function tableAttributeHtml(string $attribute): string
     {
         switch ($attribute) {
-            case 'projectTitle':
-                return $this->projectTitle;
+            case 'title':
+                return $this->title;
             case 'ownedBy':
                 return $this->getOwner() ?: '';
             case 'reviewedBy':

@@ -25,7 +25,7 @@ class Order extends Model
     // Public Properties
     // =========================================================================
 
-    public $projectTitle;
+    public $title;
     public $sourceLanguage;
     public $targetLanguage;
     public $translationContent;
@@ -53,7 +53,7 @@ class Order extends Model
             ['translationLevel', 'string'],
             ['wordCount', 'integer'],
             ['userId', 'integer'],
-            ['projectTitle', 'string'],
+            ['title', 'string'],
             ['translationSubject', 'string'],
 
             ['quoteDeliveryDate', 'date'],

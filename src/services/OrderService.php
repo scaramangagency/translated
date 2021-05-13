@@ -43,44 +43,35 @@ class OrderService extends Component
 
     public function handleQuote($data, $id = null)
     {
-        $settings = Translated::$plugin->getSettings();
+        $settings = translated::$plugin->getSettings();
 
         if ($id) {
-            $orderRecord = Order::find()
-                ->id($id)
-                ->isIncomplete(true)
-                ->one();
+            $orderRecord = Craft::$app->getElements()->getElementById($id, Order::class);
 
             if (!$orderRecord) {
                 LogToFile::error('[Order][Refresh] Failed to find order row with specified ID', 'translated');
                 return false;
             }
-
-            $dt = new \DateTime();
-            $orderRecord->dateCreated = $dt;
         } else {
             $orderRecord = new Order();
-
-            $orderRecord->sourceLanguage = $data['sourceLanguage'];
-            $orderRecord->targetLanguage = $data['targetLanguage'];
-            $orderRecord->projectTitle = $data['projectTitle'];
-            $orderRecord->translationLevel = $data['translationLevel'];
-            $orderRecord->wordCount = $data['wordCount'];
-            $orderRecord->translationSubject = $data['translationSubject'];
-            $orderRecord->translationNotes = $data['translationNotes'];
-            $orderRecord->userId = $data['userId'];
-            $orderRecord->orderStatus = 1;
-
-            if ($data['translationAsset']) {
-                $orderRecord->translationAsset = $data['translationAsset'];
-            } else {
-                $orderRecord->translationContent = $data['translationContent'];
-            }
         }
 
-        $success = Craft::$app->elements->saveElement($orderRecord, true, true, true);
+        $orderRecord->sourceLanguage = $data['sourceLanguage'];
+        $orderRecord->targetLanguage = $data['targetLanguage'];
+        $orderRecord->title = $data['title'];
+        $orderRecord->translationLevel = $data['translationLevel'];
+        $orderRecord->wordCount = $data['wordCount'];
+        $orderRecord->translationSubject = $data['translationSubject'];
+        $orderRecord->translationNotes = $data['translationNotes'];
+        $orderRecord->userId = $data['userId'];
 
-        if (!$success) {
+        if ($data['translationAsset']) {
+            $orderRecord->translationAsset = $data['translationAsset'];
+        } else {
+            $orderRecord->translationContent = $data['translationContent'];
+        }
+
+        if (!Craft::$app->getElements()->saveElement($orderRecord)) {
             LogToFile::error('[Order][Generate] Failed to save the order record', 'translated');
             return false;
         }
@@ -91,11 +82,11 @@ class OrderService extends Component
             'f' => 'quote',
             'of' => 'json',
             's' => $orderRecord['sourceLanguage'],
-            't' => implode(',', $orderRecord['targetLanguage']),
-            'pn' => $orderRecord['projectTitle'],
+            't' => $orderRecord['targetLanguage'],
+            'pn' => $orderRecord['title'],
             'jt' => $orderRecord['translationLevel'],
             'w' => $orderRecord['wordCount'],
-            'endpoint' => rtrim(Craft::parseEnv(Craft::$app->sites->primarySite->baseUrl), '/') . '/translated-api',
+            'endpoint' => rtrim(Craft::parseEnv(Craft::$app->sites->primarySite->baseUrl), '/') . '/translated/accept',
             'subject' => $orderRecord['translationSubject'],
             'instructions' => $orderRecord['translationNotes']
         ];
@@ -135,14 +126,7 @@ class OrderService extends Component
             return false;
         }
 
-        $utc = new \DateTimeZone('UTC');
-        $dt = new \DateTime($res->delivery_date, $utc);
-
-        $orderRecord->quoteDeliveryDate = $dt->format('c');
-        $orderRecord->quoteTotal = $res->total;
-        $orderRecord->quotePID = $res->pid;
-
-        $success = Craft::$app->elements->saveElement($orderRecord, true, true, true);
+        $success = $this->_attachQuote($orderRecord->id, $res);
 
         if (!$success) {
             LogToFile::error(
@@ -157,13 +141,10 @@ class OrderService extends Component
 
     public function approveQuote($id)
     {
-        $settings = Translated::$plugin->getSettings();
+        $settings = translated::$plugin->getSettings();
 
         $orderRecord = new OrderRecord();
         $orderRecord = OrderRecord::findOne(['id' => $id]);
-
-        $dt = new \DateTime();
-        $orderRecord->setAttribute('dateCreated', $dt);
 
         if (!$orderRecord) {
             LogToFile::error('[Order][Refresh] Failed to find order row with specified ID', 'translated');
@@ -173,7 +154,9 @@ class OrderService extends Component
         $params = [
             'cid' => Craft::parseEnv($settings['translatedUsername']),
             'p' => Craft::parseEnv($settings['translatedPassword']),
+            'f' => 'confirm',
             'pid' => $orderRecord['quotePID'],
+            'of' => 'json',
             'c' => '1',
             'sandbox' => 1
         ];
@@ -200,6 +183,24 @@ class OrderService extends Component
                     $res->message,
                 'translated'
             );
+            return false;
+        }
+
+        $dt = new \DateTime();
+
+        $orderRecord->setAttributes(
+            [
+                'orderStatus' => 2,
+                'reviewedBy' => Craft::$app->getUser()->id,
+                'dateApproved' => $dt
+            ],
+            false
+        );
+
+        $success = $orderRecord->save();
+
+        if (!$success) {
+            LogToFile::error('[Order][Reject] Failed to reject order with specified ID', 'translated');
             return false;
         }
 
@@ -240,7 +241,7 @@ class OrderService extends Component
             false
         );
 
-        $success = Craft::$app->elements->saveElement($order, false);
+        $success = $order->save();
 
         if (!$success) {
             LogToFile::error('[Order][Reject] Failed to reject order with specified ID', 'translated');
@@ -248,5 +249,84 @@ class OrderService extends Component
         }
 
         return true;
+    }
+
+    public function delete(array $orders): bool
+    {
+        if (!$orders) {
+            return false;
+        }
+
+        foreach ($orders as $order) {
+            Craft::$app->elements->deleteElementById($order->id, null, null, true);
+        }
+
+        return true;
+    }
+
+    public function acceptDelivery($pid, $text)
+    {
+        $order = new OrderRecord();
+        $order = OrderRecord::findOne(['quotePID' => $pid]);
+
+        $dt = new \DateTime();
+
+        $order->setAttributes(
+            [
+                'dateFulfilled' => $dt->format('c'),
+                'translatedContent' => $text,
+                'orderStatus' => 3
+            ],
+            false
+        );
+
+        $success = $order->save();
+
+        if (!$success) {
+            LogToFile::error(
+                '[Order][Handle Delivery] Record received, but update has failed. Trying to mark as failed. PID:' .
+                    $pid,
+                'translated'
+            );
+
+            $order->setAttributes(
+                [
+                    'orderStatus' => 5
+                ],
+                false
+            );
+
+            $success = $order->save();
+
+            if (!$success) {
+                LogToFile::error('[Order][Handle Delivery] Failed to mark as failed', 'translated');
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    // Private Methods
+    // =========================================================================
+    private function _attachQuote($id, $res)
+    {
+        $order = new OrderRecord();
+        $order = OrderRecord::findOne(['id' => $id]);
+
+        $utc = new \DateTimeZone('UTC');
+        $dt = new \DateTime($res->delivery_date, $utc);
+
+        $order->setAttributes(
+            [
+                'quoteDeliveryDate' => $dt->format('c'),
+                'quoteTotal' => $res->total,
+                'quotePID' => $res->pid
+            ],
+            false
+        );
+
+        return $order->save();
     }
 }

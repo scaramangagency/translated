@@ -17,6 +17,7 @@ use Craft;
 use craft\web\Controller;
 use craft\elements\Asset;
 use craft\helpers\UrlHelper;
+use putyourlightson\logtofile\LogToFile;
 
 /**
  * @author    Scaramanga Agency
@@ -33,14 +34,15 @@ class OrdersController extends Controller
      *         The actions must be in 'kebab-case'
      * @access protected
      */
-    protected $allowAnonymous = ['handleDelivery'];
+    protected $allowAnonymous = ['webhook'];
+    public $enableCsrfValidation = false;
 
     // Public Methods
     // =========================================================================
 
     public function actionIndex()
     {
-        $settings = Translated::$plugin->getSettings();
+        $settings = translated::$plugin->getSettings();
 
         if (!$settings['translatedUsername'] || !$settings['translatedPassword']) {
             return $this->redirect(UrlHelper::cpUrl('translated/settings'));
@@ -58,14 +60,14 @@ class OrdersController extends Controller
 
     public function actionNewQuote($id = null)
     {
-        $settings = Translated::$plugin->getSettings();
+        $settings = translated::$plugin->getSettings();
 
         if (!$settings['translatedUsername'] || !$settings['translatedPassword']) {
             return $this->redirect(UrlHelper::cpUrl('translated/settings'));
         }
 
         if ($id) {
-            $data = Translated::$plugin->orderService->getOrder($id);
+            $data = translated::$plugin->orderService->getOrder($id);
 
             if (!$data) {
                 Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get quote to duplicate'));
@@ -73,8 +75,8 @@ class OrdersController extends Controller
             }
         }
 
-        $availableLanguages = Translated::$plugin->utilityService->fetchAvailableLanguages($settings);
-        $availableSubjects = Translated::$plugin->utilityService->fetchAvailableSubjects($settings);
+        $availableLanguages = translated::$plugin->utilityService->fetchAvailableLanguages($settings);
+        $availableSubjects = translated::$plugin->utilityService->fetchAvailableSubjects($settings);
 
         return $this->renderTemplate('translated/orders/new', [
             'availableLanguages' => $availableLanguages['optionList'],
@@ -88,7 +90,7 @@ class OrdersController extends Controller
 
     public function actionViewOrder(int $id)
     {
-        $order = Translated::$plugin->orderService->getOrder($id);
+        $order = translated::$plugin->orderService->getOrder($id);
 
         if (!$order) {
             Craft::$app->getSession()->setError(Craft::t('app', 'An order does not exist with that ID'));
@@ -151,15 +153,24 @@ class OrdersController extends Controller
     public function actionRequestQuote()
     {
         $data = Craft::$app->getRequest()->getBodyParam('order', []);
-        $quoteId = Translated::$plugin->orderService->handleQuote($data);
+        $quoteId = translated::$plugin->orderService->handleQuote($data);
+
+        if (!$quoteId) {
+            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to generate quote'));
+            return $this->redirect(UrlHelper::cpUrl('translated/orders'));
+        }
 
         return $this->redirect(UrlHelper::cpUrl('translated/orders/view/' . $quoteId));
     }
 
-    public function actionApproveQuote()
+    public function actionApproveQuote($id)
     {
-        $data = Craft::$app->getRequest()->getBodyParam('order', []);
-        $getQuote = Translated::$plugin->orderService->approveQuote($data);
+        $approveQuote = translated::$plugin->orderService->approveQuote($id);
+
+        if (!$approveQuote) {
+            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to authorise order'));
+            return $this->redirect(UrlHelper::cpUrl('translated/orders'));
+        }
 
         Craft::$app->getSession()->setNotice(Craft::t('app', 'Quote converted to order'));
         return $this->redirect(UrlHelper::cpUrl('translated/orders'));
@@ -167,7 +178,7 @@ class OrdersController extends Controller
 
     public function actionRefreshQuote($id)
     {
-        $getQuote = Translated::$plugin->orderService->handleQuote(null, $id);
+        $getQuote = translated::$plugin->orderService->handleQuote(null, $id);
 
         if (!$getQuote) {
             Craft::$app->getSession()->setError(Craft::t('app', 'Failed to refresh quote'));
@@ -180,7 +191,7 @@ class OrdersController extends Controller
 
     public function actionRejectQuote($id)
     {
-        $rejectQuote = Translated::$plugin->orderService->rejectQuote($id);
+        $rejectQuote = translated::$plugin->orderService->rejectQuote($id);
 
         if (!$rejectQuote) {
             Craft::$app->getSession()->setError(Craft::t('app', 'Failed to reject quote'));
@@ -191,9 +202,16 @@ class OrdersController extends Controller
         return $this->redirect(UrlHelper::cpUrl('translated/orders'));
     }
 
-    public function actionHandleDelivery()
+    public function actionWebhook()
     {
-        /** Do stuff that marks the order as completed and adds the translated text */
-        return true;
+        $pid = $_POST['pid'];
+        $text = base64_decode($_POST['text']);
+
+        if (!$pid || !$text) {
+            LogToFile::error('[Order][Handle Delivery] Failed to update record for PID:' . $pid, 'translated');
+            return false;
+        }
+
+        return translated::$plugin->orderService->acceptDelivery($pid, $text);
     }
 }

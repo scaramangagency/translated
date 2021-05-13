@@ -15,7 +15,7 @@ class SettingsController extends Controller
 
     public function actionIndex()
     {
-        $settings = Translated::$plugin->getSettings();
+        $settings = translated::$plugin->getSettings();
 
         return $this->renderTemplate('translated/settings', [
             'settings' => $settings

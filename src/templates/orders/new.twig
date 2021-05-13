@@ -24,7 +24,7 @@
                     label: 'Project Name',
                     instructions: 'Add a title to this translation quote',
                     id: 'title',
-                    name: 'projectTitle',
+                    name: 'title',
                     required: 'required'
                 }) }}
 
@@ -54,19 +54,15 @@
                     value: data['sourceLanguage'] ?? selectedSource ?? 'English'
                 }) }}
 
-                {% if data %}
-                    {% set selectedValues = data['targetLanguage']|json_decode %}
-                {% endif %}
-
-                {{ forms.multiSelectField({
+                {{ forms.selectField({
                     label: 'Target Language',
-                    instructions: 'What language do you want to translate into? You can select multiple options.',
+                    instructions: 'What language do you want to translate into?',
                     id: 'targetLanguage',
                     name: 'targetLanguage',
                     required: 'required',
                     multiple: 'multiple',
                     options: availableLanguages,
-                    values: selectedValues ?? selectedTarget ?? ''
+                    values: data['targetLanguage'] ?? selectedTarget ?? ''
                 }) }}
 
                 {{ forms.selectField({

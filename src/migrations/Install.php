@@ -40,13 +40,10 @@ class Install extends Migration
 
             $this->createTable('{{%translated_orders}}', [
                 'id' => $this->primaryKey(),
-                'elementId' => $this->integer()->notNull(),
-                'siteId' => $this->integer()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'userId' => $this->integer(),
                 'reviewedBy' => $this->integer(),
-                'dateCreated' => $this->dateTime(),
                 'dateApproved' => $this->dateTime(),
                 'dateRejected' => $this->dateTime(),
                 'dateFulfilled' => $this->dateTime(),
@@ -60,7 +57,7 @@ class Install extends Migration
                 'translationSubject' => $this->text(),
                 'translationLevel' => $this->string(20),
                 'wordCount' => $this->integer(),
-                'projectTitle' => $this->text(),
+                'title' => $this->text(),
 
                 'quoteDeliveryDate' => $this->dateTime(),
                 'quoteTotal' => $this->float(),
@@ -78,8 +75,8 @@ class Install extends Migration
     protected function addForeignKeys()
     {
         $this->addForeignKey(null, '{{%translated_orders}}', 'userId', '{{%users}}', 'id', 'CASCADE', null);
-        $this->addForeignKey(null, '{{%translated_orders}}', ['elementId'], '{{%elements}}', ['id'], 'CASCADE', null);
-        $this->addForeignKey(null, '{{%translated_orders}}', ['siteId'], '{{%sites}}', ['id'], 'CASCADE', 'CASCADE');
+        $this->addForeignKey(null, '{{%translated_orders}}', 'reviewedBy', '{{%users}}', 'id', 'CASCADE', null);
+        $this->addForeignKey(null, '{{%translated_orders}}', ['id'], '{{%elements}}', ['id'], 'CASCADE', null);
     }
 
     protected function dropTables()
@@ -90,6 +87,7 @@ class Install extends Migration
     protected function dropForeignKeys()
     {
         MigrationHelper::dropForeignKeyIfExists('{{%translated_orders}}', ['userId'], $this);
+        MigrationHelper::dropForeignKeyIfExists('{{%translated_orders}}', ['reviewedBy'], $this);
         MigrationHelper::dropForeignKeyIfExists('{{%translated_orders}}', ['id'], $this);
     }
 

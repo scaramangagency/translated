@@ -34,7 +34,19 @@ class OrderQuery extends ElementQuery
     {
         $this->joinElementTable('translated_orders');
 
-        $this->query->select(['translated_orders.*']);
+        $this->query->select([
+            'translated_orders.id',
+            'translated_orders.title',
+            'translated_orders.userId',
+            'translated_orders.reviewedBy',
+            'translated_orders.dateCreated',
+            'translated_orders.dateApproved',
+            'translated_orders.dateRejected',
+            'translated_orders.dateFulfilled',
+            'translated_orders.orderStatus',
+            'translated_orders.quoteDeliveryDate',
+            'translated_orders.quoteTotal'
+        ]);
 
         if ($this->orderStatus) {
             $this->subQuery->andWhere(Db::parseParam('translated_orders.orderStatus', $this->orderStatus));

@@ -53,6 +53,9 @@
     background-color: #2e8540;
     color: white;
 }
+.label.failed {
+    background-color: #fdb81e;
+}
 .label.rejected,
 .label.expired {
     background-color: #dc143c;
