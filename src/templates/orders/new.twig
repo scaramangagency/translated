@@ -74,12 +74,15 @@
                     value: data['translationSubject'] ?? 'general'
                 }) }}
 
+                {% set translationContent = data['translatedContent']|raw %}
+
                 {{ forms.textareaField({
                     label: 'Content',
                     id: 'translationContent',
                     name: 'translationContent',
                     required: 'required',
-                    value: data['translationContent'] ?? ''
+                    rows: 10,
+                    value: translationContent ?? ''
                 }) }}
 
                 OR
@@ -129,11 +132,19 @@
     let countInput = document.querySelector('#order-translationContent');
     let countArea = document.querySelector('#order-wordCount');
     
-    countInput.addEventListener('keyup', (e) => {
-        let c = e.currentTarget.value.trim();
+    function handleCount(e) {
+        let c = e.value.trim();
         if (!c) return 0;
 
         let counter = c.split(/\s+/).length;
         countArea.value = counter;
+    }
+
+    countInput.addEventListener('keyup', (e) => {
+        handleCount(e.currentTarget);
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        handleCount(countInput);
     });
 {% endjs %}

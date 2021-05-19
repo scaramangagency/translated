@@ -78,46 +78,8 @@ class OrdersController extends Controller
             return $this->redirect(Craft::$app->getRequest()->referrer);
         }
 
-        $value = [];
-        $value[] = $element->title;
-
-        foreach ($element->getFieldLayout()->getFields() as $field) {
-            if (
-                $field instanceof \craft\fields\PlainText ||
-                $field instanceof \craft\redactor\Field ||
-                $field instanceof \craft\fields\Table
-            ) {
-                $v = $element->getFieldValue($field->handle);
-                $value[$field->handle] = $field->serializeValue($v, $element);
-            }
-
-            if ($field instanceof \craft\fields\Matrix) {
-                foreach ($field->blockTypeFields as $matrixField) {
-                    //var_dump($field->blockTypeFields);
-                    if (
-                        $matrixField instanceof \craft\fields\PlainText ||
-                        $matrixField instanceof \craft\redactor\Field ||
-                        $matrixField instanceof \craft\fields\Table
-                    ) {
-                        // var_dump($matrixField);
-                        $v = $element->getFieldValue($field->handle);
-                        $fieldData = $field->serializeValue($v, $element);
-
-                        $a = [];
-                        foreach ($fieldData as $d) {
-                            $a[] = $d['fields'];
-                        }
-
-                        $value[$field->handle] = $a;
-                    }
-                }
-            }
-        }
-
-        // $serializedForm = $element->getSerializedFieldValues();
-
-        var_dump($value);
-        exit();
+        $content = translated::$plugin->utilityService->getDataFromElement($element);
+        $data['translatedContent'] = $content;
 
         $availableLanguages = translated::$plugin->utilityService->fetchAvailableLanguages($settings);
         $availableSubjects = translated::$plugin->utilityService->fetchAvailableSubjects($settings);
