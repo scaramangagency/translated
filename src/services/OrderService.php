@@ -41,6 +41,53 @@ class OrderService extends Component
         return $order;
     }
 
+    public function getOrderStatus($id)
+    {
+        $settings = translated::$plugin->getSettings();
+
+        $order = new OrderRecord();
+        $order = OrderRecord::findOne(['id' => $id]);
+
+        if (!$order) {
+            LogToFile::error('[Order][Status] Failed to find order with specified ID', 'translated');
+            return false;
+        }
+
+        $params = [
+            'cid' => Craft::parseEnv($settings['translatedUsername']),
+            'p' => Craft::parseEnv($settings['translatedPassword']),
+            'f' => 'status',
+            'of' => 'json',
+            'pid' => $order['quotePID']
+        ];
+
+        try {
+            $ch = curl_init();
+
+            curl_setopt($ch, CURLOPT_URL, 'https://www.translated.net/hts/?' . http_build_query($params));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+            $res = curl_exec($ch);
+            curl_close($ch);
+        } catch (Exception $e) {
+            LogToFile::error('[Order][Status] Failed to get status of this order', 'translated');
+            return false;
+        }
+
+        $res = json_decode($res);
+
+        if ($res->code == 0) {
+            LogToFile::error(
+                '[Order][Status] translated API returned an error when getting order status. Error: ' . $res->message,
+                'translated'
+            );
+            return false;
+        }
+
+        return $order;
+    }
+
     public function handleQuote($data, $id = null)
     {
         $settings = translated::$plugin->getSettings();
@@ -49,7 +96,7 @@ class OrderService extends Component
             $orderRecord = Craft::$app->getElements()->getElementById($id, Order::class);
 
             if (!$orderRecord) {
-                LogToFile::error('[Order][Refresh] Failed to find order row with specified ID', 'translated');
+                LogToFile::error('[Order][Quote] Failed to find order row with specified ID', 'translated');
                 return false;
             }
         } else {
@@ -72,7 +119,7 @@ class OrderService extends Component
         }
 
         if (!Craft::$app->getElements()->saveElement($orderRecord)) {
-            LogToFile::error('[Order][Generate] Failed to save the order record', 'translated');
+            LogToFile::error('[Order][Quote] Failed to save the order record', 'translated');
             return false;
         }
 
@@ -97,7 +144,7 @@ class OrderService extends Component
                 ->one();
 
             $params['text'] = $translationAsset->url;
-            $params['df'] = $translationAsset->mimeType;
+            $params['df'] = explode('/', $translationAsset->mimeType)[1];
         } else {
             $params['text'] = $orderRecord['translationContent'];
         }
@@ -112,7 +159,7 @@ class OrderService extends Component
             $res = curl_exec($ch);
             curl_close($ch);
         } catch (Exception $e) {
-            LogToFile::error('[Order][Generate] Failed to generate a quote', 'translated');
+            LogToFile::error('[Order][Quote] Failed to generate a quote', 'translated');
             return false;
         }
 
@@ -147,7 +194,7 @@ class OrderService extends Component
         $orderRecord = OrderRecord::findOne(['id' => $id]);
 
         if (!$orderRecord) {
-            LogToFile::error('[Order][Refresh] Failed to find order row with specified ID', 'translated');
+            LogToFile::error('[Order][Approve] Failed to find order row with specified ID', 'translated');
             return false;
         }
 
@@ -157,9 +204,14 @@ class OrderService extends Component
             'f' => 'confirm',
             'pid' => $orderRecord['quotePID'],
             'of' => 'json',
-            'c' => '1',
-            'sandbox' => 1
+            'c' => '1'
         ];
+
+        if ($settings['translatedSandbox']) {
+            $params = [
+                'sandbox' => 1
+            ];
+        }
 
         try {
             $ch = curl_init();
@@ -171,7 +223,7 @@ class OrderService extends Component
             $res = curl_exec($ch);
             curl_close($ch);
         } catch (Exception $e) {
-            LogToFile::error('[Order][Place] Failed to convert quote to an order', 'translated');
+            LogToFile::error('[Order][Approve] Failed to convert quote to an order', 'translated');
             return false;
         }
 
@@ -179,7 +231,7 @@ class OrderService extends Component
 
         if ($res->code == 0) {
             LogToFile::error(
-                '[Order][Place] translated API returned an error when converting this quote to an order. Error: ' .
+                '[Order][Approve] translated API returned an error when converting this quote to an order. Error: ' .
                     $res->message,
                 'translated'
             );
@@ -200,7 +252,7 @@ class OrderService extends Component
         $success = $orderRecord->save();
 
         if (!$success) {
-            LogToFile::error('[Order][Reject] Failed to reject order with specified ID', 'translated');
+            LogToFile::error('[Order][Approve] Failed to reject order with specified ID', 'translated');
             return false;
         }
 
@@ -213,7 +265,7 @@ class OrderService extends Component
         $order = OrderRecord::findOne(['id' => $id]);
 
         if (!$order) {
-            LogToFile::error('[Order][Reject] Failed to find order with specified ID', 'translated');
+            LogToFile::error('[Order][Duplicate] Failed to find order with specified ID', 'translated');
             return false;
         }
 
@@ -284,8 +336,7 @@ class OrderService extends Component
 
         if (!$success) {
             LogToFile::error(
-                '[Order][Handle Delivery] Record received, but update has failed. Trying to mark as failed. PID:' .
-                    $pid,
+                '[Order][Accept] Record received, but update has failed. Trying to mark as failed. PID:' . $pid,
                 'translated'
             );
 
@@ -299,10 +350,20 @@ class OrderService extends Component
             $success = $order->save();
 
             if (!$success) {
-                LogToFile::error('[Order][Handle Delivery] Failed to mark as failed', 'translated');
+                LogToFile::error('[Order][Accept] Failed to mark as failed', 'translated');
             }
 
             return false;
+        }
+
+        $settings = translated::$plugin->getSettings();
+
+        if ($settings['translatedCleanup'] && $order->translationAsset) {
+            $deleteAsset = Craft::$app->elements->deleteElementById($order->translationAsset->id);
+
+            if (!$deleteAsset) {
+                LogToFile::error('[Order][Accept] Failed to delete related asset', 'translated');
+            }
         }
 
         return true;

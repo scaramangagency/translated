@@ -4,6 +4,7 @@ namespace scaramangagency\translated;
 use scaramangagency\translated\services\Order as OrderService;
 use scaramangagency\translated\models\Settings;
 use scaramangagency\translated\elements\Order;
+use scaramangagency\translated\web\TranslatedAsset;
 
 use Craft;
 use craft\base\Plugin;
@@ -13,6 +14,7 @@ use craft\services\Elements;
 use craft\events\PluginEvent;
 use craft\web\UrlManager;
 use craft\helpers\UrlHelper;
+use craft\web\View;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\events\RegisterComponentTypesEvent;
@@ -43,6 +45,7 @@ class Translated extends Plugin
         $this->registerSiteUrls();
         $this->registerPermissions();
         $this->registerElementType();
+        $this->addCPHooks();
 
         Event::on(Plugins::class, Plugins::EVENT_AFTER_INSTALL_PLUGIN, function (PluginEvent $event) {
             if ($event->plugin === $this) {
@@ -134,7 +137,8 @@ class Translated extends Plugin
                 'translated/orders' => 'translated/orders/index',
                 'translated/orders/new' => 'translated/orders/new-quote',
                 'translated/orders/duplicate/<id>' => 'translated/orders/new-quote',
-                'translated/orders/view/<id>' => 'translated/orders/view-order'
+                'translated/orders/view/<id>' => 'translated/orders/view-order',
+                'translated/orders/autogenerate/<siteId>/<id>' => 'translated/orders/autogenerate'
             ]);
         });
     }
@@ -169,6 +173,21 @@ class Translated extends Plugin
                     ]
                 ]
             ];
+        });
+    }
+
+    private function addCPHooks()
+    {
+        Event::on(View::class, View::EVENT_BEFORE_RENDER_TEMPLATE, function (\craft\events\TemplateEvent $event) {
+            $view = Craft::$app->getView();
+            $view->registerAssetBundle(TranslatedAsset::class);
+        });
+
+        Craft::$app->getView()->hook('cp.entries.edit.details', function (array &$context) {
+            $entry = $context['entry'];
+            $generateUrl = UrlHelper::cpUrl('translated/orders/autogenerate/' . $entry->siteId . '/' . $entry->id);
+
+            return '<a href="' . $generateUrl . '" class="btn tertiary full">Translate entry</a>';
         });
     }
 }

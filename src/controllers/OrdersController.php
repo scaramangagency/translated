@@ -58,6 +58,80 @@ class OrdersController extends Controller
         ]);
     }
 
+    public function actionAutogenerate($id, $siteId)
+    {
+        $settings = translated::$plugin->getSettings();
+
+        if (!$settings['translatedUsername'] || !$settings['translatedPassword']) {
+            return $this->redirect(UrlHelper::cpUrl('translated/settings'));
+        }
+
+        $element = Craft::$app->getElements()->getElementById($id, null, $siteId);
+
+        if (!$element) {
+            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get get content from this entry'));
+            return $this->redirect(Craft::$app->getRequest()->referrer);
+        }
+
+        if (!$element->getFieldLayout()) {
+            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get get content from this entry'));
+            return $this->redirect(Craft::$app->getRequest()->referrer);
+        }
+
+        $value = [];
+        $value[] = $element->title;
+
+        foreach ($element->getFieldLayout()->getFields() as $field) {
+            if (
+                $field instanceof \craft\fields\PlainText ||
+                $field instanceof \craft\redactor\Field ||
+                $field instanceof \craft\fields\Table
+            ) {
+                $v = $element->getFieldValue($field->handle);
+                $value[$field->handle] = $field->serializeValue($v, $element);
+            }
+
+            if ($field instanceof \craft\fields\Matrix) {
+                foreach ($field->blockTypeFields as $matrixField) {
+                    //var_dump($field->blockTypeFields);
+                    if (
+                        $matrixField instanceof \craft\fields\PlainText ||
+                        $matrixField instanceof \craft\redactor\Field ||
+                        $matrixField instanceof \craft\fields\Table
+                    ) {
+                        // var_dump($matrixField);
+                        $v = $element->getFieldValue($field->handle);
+                        $fieldData = $field->serializeValue($v, $element);
+
+                        $a = [];
+                        foreach ($fieldData as $d) {
+                            $a[] = $d['fields'];
+                        }
+
+                        $value[$field->handle] = $a;
+                    }
+                }
+            }
+        }
+
+        // $serializedForm = $element->getSerializedFieldValues();
+
+        var_dump($value);
+        exit();
+
+        $availableLanguages = translated::$plugin->utilityService->fetchAvailableLanguages($settings);
+        $availableSubjects = translated::$plugin->utilityService->fetchAvailableSubjects($settings);
+
+        return $this->renderTemplate('translated/orders/new', [
+            'availableLanguages' => $availableLanguages['optionList'],
+            'availableSubjects' => $availableSubjects,
+            'elementType' => Asset::class,
+            'selectedSource' => $availableLanguages['selectedSource'],
+            'selectedTarget' => $availableLanguages['selectedTarget'],
+            'data' => $data ?? null
+        ]);
+    }
+
     public function actionNewQuote($id = null)
     {
         $settings = translated::$plugin->getSettings();
@@ -141,12 +215,17 @@ class OrdersController extends Controller
                 break;
         }
 
+        if ($order->orderStatus == 2) {
+            $orderStatus = translated::$plugin->orderService->getOrderStatus($id);
+        }
+
         return $this->renderTemplate('translated/orders/view', [
             'order' => $order,
             'orderPermissions' => $orderPermissions ?? false,
             'requestQuote' => $requestQuote ?? false,
             'statusFlag' => '<span class="label order-status ' . strtolower($status) . '">' . $status . '</span>',
-            'serviceLevel' => '<span class="label order-service ' . strtolower($service) . '">' . $service . '</span>'
+            'serviceLevel' => '<span class="label order-service ' . strtolower($service) . '">' . $service . '</span>',
+            'orderStatus' => $orderStatus ?? null
         ]);
     }
 

@@ -15,9 +15,13 @@
     background-color: transparent;
 }
 
+.btn.tertiary.full {
+    width: 100%;
+}
+
 .btn.tertiary:hover {
-    border-color: transparent;
-    color: #3f4d5a;
+    background-color: #b7252f;
+    color: white;
 }
 
 .label.order-status,

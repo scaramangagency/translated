@@ -123,3 +123,17 @@
         </form>
     {% endif %}
 {% endset %}
+
+
+{% js %}
+    let countInput = document.querySelector('#order-translationContent');
+    let countArea = document.querySelector('#order-wordCount');
+    
+    countInput.addEventListener('keyup', (e) => {
+        let c = e.currentTarget.value.trim();
+        if (!c) return 0;
+
+        let counter = c.split(/\s+/).length;
+        countArea.value = counter;
+    });
+{% endjs %}

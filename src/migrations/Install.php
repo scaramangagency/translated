@@ -76,7 +76,8 @@ class Install extends Migration
     {
         $this->addForeignKey(null, '{{%translated_orders}}', 'userId', '{{%users}}', 'id', 'CASCADE', null);
         $this->addForeignKey(null, '{{%translated_orders}}', 'reviewedBy', '{{%users}}', 'id', 'CASCADE', null);
-        $this->addForeignKey(null, '{{%translated_orders}}', ['id'], '{{%elements}}', ['id'], 'CASCADE', null);
+        $this->addForeignKey(null, '{{%translated_orders}}', 'id', '{{%elements}}', 'id', 'CASCADE', null);
+        $this->addForeignKey(null, '{{%translated_orders}}', 'translationAsset', '{{%assets}}', 'id', 'CASCADE', null);
     }
 
     protected function dropTables()
@@ -86,9 +87,11 @@ class Install extends Migration
 
     protected function dropForeignKeys()
     {
-        MigrationHelper::dropForeignKeyIfExists('{{%translated_orders}}', ['userId'], $this);
-        MigrationHelper::dropForeignKeyIfExists('{{%translated_orders}}', ['reviewedBy'], $this);
-        MigrationHelper::dropForeignKeyIfExists('{{%translated_orders}}', ['id'], $this);
+        MigrationHelper::dropForeignKeyIfExists(
+            '{{%translated_orders}}',
+            ['userId', 'id', 'reviewedBy', 'translationAsset'],
+            $this
+        );
     }
 
     protected function removeContent()

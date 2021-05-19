@@ -181,7 +181,7 @@ class Order extends Element
     public function getEstimatedDeliveryDate()
     {
         if ($this->quoteDeliveryDate !== null) {
-            return $this->quoteDeliveryDate;
+            return \Craft::$app->getFormatter()->asDatetime($this->quoteDeliveryDate, 'short');
         }
 
         return null;
@@ -226,11 +226,6 @@ class Order extends Element
         return $this->getReviewedBy()->fullName ?? '';
     }
 
-    // public function getContentTable(): string
-    // {
-    //     return '{{%translated_orders}}';
-    // }
-
     public function afterSave(bool $isNew)
     {
         if (!$isNew) {
@@ -257,8 +252,8 @@ class Order extends Element
         $record->userId = $this->userId;
         $record->orderStatus = $this->orderStatus;
 
-        if ($this->translationAsset) {
-            $record->translationAsset = $this->translationAsset;
+        if ($this->translationAsset[0]) {
+            $record->translationAsset = $this->translationAsset[0];
         } else {
             $record->translationContent = $this->translationContent;
         }
@@ -294,8 +289,8 @@ class Order extends Element
     {
         $attributes = [];
         $attributes[] = 'title';
-        $attributes[] = 'dateCreated';
         $attributes[] = 'orderStatus';
+        $attributes[] = 'dateCreated';
         $attributes[] = 'ownedBy';
 
         if ($source == 'orderStatus:1') {
@@ -346,10 +341,12 @@ class Order extends Element
                 return $this->getStatus();
             case 'estimatedDeliveryDate':
                 return $this->getEstimatedDeliveryDate();
+            case 'quoteTotal':
+                return \Craft::$app->getFormatter()->asCurrency($this->$attribute, 'EUR');
             case 'dateApproved':
             case 'dateRejected':
             case 'dateFulfilled':
-                return $this->$attribute ? parent::tableAttributeHtml($attribute) : '-';
+                return $this->$attribute ? \Craft::$app->getFormatter()->asDatetime($this->$attribute, 'short') : '-';
             default:
                 return parent::tableAttributeHtml($attribute);
         }

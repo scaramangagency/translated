@@ -27,12 +27,18 @@ class Settings extends Model
 
     public $translatedUsername;
     public $translatedPassword;
+    public $translatedCleanup;
+    public $translatedSandbox;
 
     // Public Methods
     // =========================================================================
 
     public function rules()
     {
-        return [[['translatedUsername', 'translatedPassword'], 'required']];
+        return [
+            [['translatedUsername', 'translatedPassword'], 'required'],
+            ['translatedCleanup', 'boolean'],
+            ['translatedSandbox', 'boolean']
+        ];
     }
 }

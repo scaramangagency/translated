@@ -33,9 +33,24 @@
                 suggestEnvVars: true,
                 errors: settings.getErrors('translatedPassword')})
             }}
+
+            {{ forms.lightswitchField({
+                label: 'Clean up files',
+                instructions: 'Delete files attached to translation order once translation has been fulfilled.',
+                id: 'translatedCleanup',
+                name: 'translatedCleanup',
+                on: settings['translatedCleanup']
+            }) }}
+
+            {{ forms.lightswitchField({
+                label: 'Sandbox mode',
+                instructions: 'Submit test orders. The text of the delivered message will not be the translation, but the same text you sent with the quote. Expect deliveries in a random amount of time ranging between 30 seconds and 2 minutes.',
+                id: 'translatedSandbox',
+                name: 'translatedSandbox',
+                on: settings['translatedSandbox']
+            }) }}
         {% endnamespace %}
         
-        <p>clean up files after translation has been received?</p>
         <input type="submit" class="submit btn" value="{{ 'Save'|t }}">
     </form>
 {% endset %}
