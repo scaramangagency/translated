@@ -153,6 +153,7 @@ class UtilityService extends Component
         $value['title'] = $element->title;
 
         foreach ($element->getFieldLayout()->getFields() as $field) {
+            // Generic Plain Text + Redactor Fields
             if ($field instanceof \craft\fields\PlainText || $field instanceof \craft\redactor\Field) {
                 $v = $element->getFieldValue($field->handle);
                 $value[$field->handle] = str_replace(
@@ -162,15 +163,18 @@ class UtilityService extends Component
                 );
             }
 
+            // Matrix fields
             if ($field instanceof \craft\fields\Matrix) {
                 $matrixElement = $element->{$field->handle}->all();
-
                 $i = 0;
+
                 foreach ($matrixElement as $matrixField) {
                     $i++;
                     $matrixBlock = Craft::$app->getMatrix()->getBlockById($matrixField->id);
                     $fieldValues = $matrixBlock->fieldValues;
+
                     foreach ($fieldValues as $k => $v) {
+                        // Redactor
                         if ($v instanceof \craft\redactor\FieldData) {
                             $value[$matrixBlock->id][$k] = str_replace(
                                 ["\\r", "\\n"],
@@ -178,6 +182,8 @@ class UtilityService extends Component
                                 strip_tags($v->getParsedContent())
                             );
                         }
+
+                        // Supertable
                         if ($v instanceof \verbb\supertable\elements\db\SuperTableBlockQuery) {
                             $supertableFields = $v->fieldValues;
 
@@ -193,6 +199,8 @@ class UtilityService extends Component
                                 }
                             }
                         }
+
+                        // Plain Text
                         if (!is_object($v) && $v != '') {
                             $value[$matrixBlock->id][$k] = $v;
                         }
@@ -204,13 +212,16 @@ class UtilityService extends Component
         $contentString = '';
 
         foreach ($value as $k => $v) {
+            // This is a plain text field
             if (!is_array($v)) {
                 $contentString .= $v . " \r\n\r\n";
             } else {
                 foreach ($v as $ck => $cv) {
+                    // This is a matrix field (or top level supertable)
                     if (!is_array($cv)) {
                         $contentString .= $cv . " \r\n\r\n";
                     } else {
+                        // This is an embedded supertable field
                         foreach ($cv as $gck => $gcv) {
                             $contentString .= $gcv . " \r\n\r\n";
                         }
