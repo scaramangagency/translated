@@ -79,7 +79,7 @@ class OrdersController extends Controller
         }
 
         $content = translated::$plugin->utilityService->getDataFromElement($element);
-        $data['translatedContent'] = $content;
+        $data['translationContent'] = $content;
 
         $availableLanguages = translated::$plugin->utilityService->fetchAvailableLanguages($settings);
         $availableSubjects = translated::$plugin->utilityService->fetchAvailableSubjects($settings);
@@ -178,7 +178,7 @@ class OrdersController extends Controller
         }
 
         if ($order->orderStatus == 2) {
-            $orderStatus = translated::$plugin->orderService->getOrderStatus($id);
+            $orderStatusFromHTS = translated::$plugin->orderService->getOrderStatus($id);
         }
 
         return $this->renderTemplate('translated/orders/view', [
@@ -187,7 +187,8 @@ class OrdersController extends Controller
             'requestQuote' => $requestQuote ?? false,
             'statusFlag' => '<span class="label order-status ' . strtolower($status) . '">' . $status . '</span>',
             'serviceLevel' => '<span class="label order-service ' . strtolower($service) . '">' . $service . '</span>',
-            'orderStatus' => $orderStatus ?? null
+            'orderStatusFromHTS' => $orderStatusFromHTS ?? null,
+            'inSandbox' => translated::$plugin->getSettings()->translatedSandbox
         ]);
     }
 

@@ -45,10 +45,10 @@
         <div id="tab-fulfilled">
 
             {% if order.orderStatus == 2 %}
-                {% if not orderStatus %}
+                {% if not orderStatusFromHTS %}
                     <p>Failed to get the status of this order. Please try again later.</p>
                 {% else %}
-                    <p>{{ dump(orderStatus) }}</p>
+                    <p>{{ dump(orderStatusFromHTS) }}</p>
                 {% endif %}
             {% else %}
                 <h2>Translated Content</h2>
@@ -59,22 +59,28 @@
         </div>
     {% endif %}
     <div id="tab-information" {% if order.orderStatus == 2 or order.orderStatus == 3 %}class="hidden"{% endif %}>
-        <p>Source Language: {{ order.sourceLanguage }}</p>
-        <p>Target Language: {{ order.targetLanguage }}</p>
-        
+        <p><strong>Source Language</strong><br> {{ order.sourceLanguage }}</p>
+        <p><strong>Target Language</strong><br> {{ order.targetLanguage }}</p>
+        <p><strong>Subject</strong><br> {{ order.translationSubject }}</p>
+        <p><strong>Word Count</strong><br> {{ order.wordCount }}</p>
+        <p><strong>Notes</strong><br> {{ order.translationNotes }}</p>
+
         {% if order.translationAsset != '' %}
             {% set uploadedAsset = craft.assets.id(order.translationAsset).one() %}
-            <p>Asset: <a href="{{ uploadedAsset.cpEditUrl }}">{{ uploadedAsset.title }}</a></p>
+            <p><strong>Asset</strong><br> <a href="{{ uploadedAsset.cpEditUrl }}">{{ uploadedAsset.title }}</a></p>
         {% else %}
-            <p>Content: {{ order.translationContent|nl2br }}</p>
+            <p><strong>Content</strong><br> {{ order.translationContent|nl2br }}</p>
         {% endif %}
-        <p>Notes: {{ order.translationNotes }}</p>
-        <p>Subject: {{ order.translationSubject }}</p>
-        <p>Word Count: {{ order.wordCount }}</p>
+        
     </div>
 {% endset %}
 
 {% set details %}
+    {% if inSandbox %}
+        <div id="alerts" class="mb-8">
+            <p>Sandbox mode is enabled</p>
+        </div>
+    {% endif %}
 
     <div class="meta warning">
         <div class="data">

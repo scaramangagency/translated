@@ -85,7 +85,7 @@ class OrderService extends Component
             return false;
         }
 
-        return $order;
+        return $res;
     }
 
     public function handleQuote($data, $id = null)
@@ -208,9 +208,7 @@ class OrderService extends Component
         ];
 
         if ($settings['translatedSandbox']) {
-            $params = [
-                'sandbox' => 1
-            ];
+            $params['sandbox'] = 1;
         }
 
         try {

@@ -252,7 +252,7 @@ class Order extends Element
         $record->userId = $this->userId;
         $record->orderStatus = $this->orderStatus;
 
-        if ($this->translationAsset[0]) {
+        if ($this->translationAsset) {
             $record->translationAsset = $this->translationAsset[0];
         } else {
             $record->translationContent = $this->translationContent;

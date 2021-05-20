@@ -28,8 +28,8 @@
                     required: 'required'
                 }) }}
 
-                Economy: Machine Translation with Light human review. Cheapest.
-                Professional: Human Translation with quality control. Mid-price.
+                Economy: Machine Translation with Light human review. Cheapest.<br>
+                Professional: Human Translation with quality control. Mid-price.<br>
                 Premium: Human Translation with Specialist review and quality control. Most expensive.
 
                 {{ forms.selectField({
@@ -74,7 +74,7 @@
                     value: data['translationSubject'] ?? 'general'
                 }) }}
 
-                {% set translationContent = data['translatedContent']|raw %}
+                {% set translationContent = data ? data['translationContent']|raw : null %}
 
                 {{ forms.textareaField({
                     label: 'Content',
