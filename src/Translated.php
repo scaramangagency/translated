@@ -158,7 +158,7 @@ class Translated extends Plugin
             RegisterUserPermissionsEvent $event
         ) {
             $event->permissions[Craft::t('translated', 'translated')] = [
-                'trnslated:settings' => [
+                'translated:settings' => [
                     'label' => Craft::t('translated', 'Settings')
                 ],
                 'translated:orders' => [
