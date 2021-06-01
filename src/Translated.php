@@ -44,6 +44,7 @@ class Translated extends Plugin
         $this->registerCpUrls();
         $this->registerSiteUrls();
         $this->registerPermissions();
+        $this->registerComponents();
         $this->registerElementType();
         $this->addCPHooks();
 
@@ -126,6 +127,17 @@ class Translated extends Plugin
         ) {
             $event->types[] = Order::class;
         });
+    }
+
+    private function registerComponents()
+    {
+        $this->setComponents([
+            'orderService' => \scaramangagency\translated\services\OrderService::class,
+            'utilityService' => \scaramangagency\translated\services\UtilityService::class,
+            'dataService' => \scaramangagency\translated\services\DataService::class,
+            'profileService' => \scaramangagency\trustpilot\services\ProfileService::class,
+            'resourcesService' => \scaramangagency\trustpilot\services\ResourcesService::class
+        ]);
     }
 
     private function registerCpUrls()

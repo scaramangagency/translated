@@ -12,6 +12,7 @@ namespace scaramangagency\translated\controllers;
 
 use scaramangagency\translated\Translated;
 use scaramangagency\translated\services\UtilityService;
+use scaramangagency\translated\services\DataService;
 
 use Craft;
 use craft\web\Controller;
@@ -78,8 +79,9 @@ class OrdersController extends Controller
             return $this->redirect(Craft::$app->getRequest()->referrer);
         }
 
-        $content = translated::$plugin->utilityService->getDataFromElement($element);
-        $data['translationContent'] = $content;
+        $data['translationAsset'] = translated::$plugin->dataService->generateCSVForTranslation($element);
+        $data['wordCount'] = translated::$plugin->dataService->getWordCount($element);
+        $data['translationNotes'] = "Please translate text from RAW column into TRANSLATED column ONLY. \r\n\r\n";
 
         $availableLanguages = translated::$plugin->utilityService->fetchAvailableLanguages($settings);
         $availableSubjects = translated::$plugin->utilityService->fetchAvailableSubjects($settings);

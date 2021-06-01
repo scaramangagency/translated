@@ -17,8 +17,19 @@ class SettingsController extends Controller
     {
         $settings = translated::$plugin->getSettings();
 
+        $res = Craft::$app->volumes->getAllVolumes();
+        $decorateVolumes = [];
+
+        foreach ($res as $volume) {
+            $decorateVolumes[] = [
+                'label' => $volume->name,
+                'value' => $volume->id
+            ];
+        }
+
         return $this->renderTemplate('translated/settings', [
-            'settings' => $settings
+            'settings' => $settings,
+            'assetOptions' => $decorateVolumes
         ]);
     }
 

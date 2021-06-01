@@ -29,6 +29,7 @@ class Settings extends Model
     public $translatedPassword;
     public $translatedCleanup;
     public $translatedSandbox;
+    public $translatedAutogenerationDirectory;
 
     // Public Methods
     // =========================================================================
@@ -38,7 +39,8 @@ class Settings extends Model
         return [
             [['translatedUsername', 'translatedPassword'], 'required'],
             ['translatedCleanup', 'boolean'],
-            ['translatedSandbox', 'boolean']
+            ['translatedSandbox', 'boolean'],
+            ['translatedAutogenerationDirectory', 'integer']
         ];
     }
 }

@@ -26,13 +26,13 @@
         "putyourlightson/craft-log-to-file": "^1.0.0"
     },
     "require-dev": {
-      "craftcms/cms": "^3.6.0",
-      "codeception/codeception": "^3.0",
-      "vlucas/phpdotenv": "^3.0"
+        "craftcms/cms": "^3.6.0",
+        "codeception/codeception": "^3.0",
+        "vlucas/phpdotenv": "^3.0"
     },
     "autoload": {
         "psr-4": {
-          "scaramangagency\\translated\\": "src/"
+            "scaramangagency\\translated\\": "src/"
         }
     },
     "extra": {
@@ -42,10 +42,6 @@
         "developerUrl": "https://scaramanga.agency",
         "documentationUrl": "https://github.com/scaramangagency/translated/blob/master/README.md",
         "changelogUrl": "https://raw.githubusercontent.com/scaramangagency/translated/master/CHANGELOG.md",
-        "components": {
-            "orderService": "scaramangagency\\translated\\services\\OrderService",
-            "utilityService": "scaramangagency\\translated\\services\\UtilityService"
-        },
         "class": "scaramangagency\\translated\\Translated"
     }
 }
