@@ -14,6 +14,7 @@ use scaramangagency\translated\Translated;
 
 use Craft;
 use craft\base\Component;
+use verbb\supertable\SuperTable;
 
 /**
  * @author    Scaramanga Agency
@@ -34,10 +35,14 @@ class SupertableField extends Component
             $field->handle => []
         ];
 
+        $blockTypes = SuperTable::$plugin->getService()->getBlockTypesByFieldId($field->id);
+        $blockType = $blockTypes[0];
+
         foreach ($supertableBlocks as $block) {
             $blockId = $block->id;
 
             $data[$field->handle][$blockId] = [
+                //'type' => $blockType->id,
                 'fields' => translated::$plugin->dataService->getDataFromElement($block)
             ];
         }

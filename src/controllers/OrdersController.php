@@ -79,9 +79,17 @@ class OrdersController extends Controller
             return $this->redirect(Craft::$app->getRequest()->referrer);
         }
 
-        $data['translationAsset'] = translated::$plugin->dataService->generateCSVForTranslation($element);
+        $csv = translated::$plugin->dataService->generateCSVForTranslation($element);
+
+        if ($csv['uploaded']) {
+            $data['translationAsset'] = $csv['path'];
+        } else {
+            $data['failedUpload'] = basename($csv['path']);
+        }
+
+        $data['projectName'] = $element->title;
         $data['wordCount'] = translated::$plugin->dataService->getWordCount($element);
-        $data['translationNotes'] = "Please translate text from RAW column into TRANSLATED column ONLY. \r\n\r\n";
+        $data['translationNotes'] = "Please translate text from RAW column into TRANSLATED column ONLY. \r\n";
 
         $availableLanguages = translated::$plugin->utilityService->fetchAvailableLanguages($settings);
         $availableSubjects = translated::$plugin->utilityService->fetchAvailableSubjects($settings);
@@ -94,6 +102,28 @@ class OrdersController extends Controller
             'selectedTarget' => $availableLanguages['selectedTarget'],
             'data' => $data ?? null
         ]);
+    }
+
+    public function actionManualDownload($fp)
+    {
+        $filepath = Craft::$app->getPath()->getTempAssetUploadsPath() . DIRECTORY_SEPARATOR . $fp;
+
+        if (file_exists($filepath)) {
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/csv');
+            header('Content-Disposition: attachment; filename=' . basename($filepath));
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($filepath));
+            ob_clean();
+            flush();
+
+            readfile($filepath);
+            exit();
+        } else {
+            // show some sort of nice message saying couldnt get the file
+        }
     }
 
     public function actionNewQuote($id = null)

@@ -24,7 +24,11 @@ class StandardField extends Component
 {
     public function decorateStandardData($element, $field)
     {
-        return [$field->handle => $element->getFieldValue($field->handle)];
+        if ($field instanceof \craft\redactor\Field) {
+            return [$field->handle => strip_tags($element->getFieldValue($field->handle)->getParsedContent())];
+        } else {
+            return [$field->handle => $element->getFieldValue($field->handle)];
+        }
     }
 
     public function getStandardDataWordCount($element, $field)

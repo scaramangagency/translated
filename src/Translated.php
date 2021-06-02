@@ -150,7 +150,8 @@ class Translated extends Plugin
                 'translated/orders/new' => 'translated/orders/new-quote',
                 'translated/orders/duplicate/<id>' => 'translated/orders/new-quote',
                 'translated/orders/view/<id>' => 'translated/orders/view-order',
-                'translated/orders/autogenerate/<siteId>/<id>' => 'translated/orders/autogenerate'
+                'translated/orders/autogenerate/<siteId>/<id>' => 'translated/orders/autogenerate',
+                'translated/orders/manual-download' => 'translated/orders/manual-download'
             ]);
         });
     }

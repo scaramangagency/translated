@@ -14,6 +14,12 @@
     {% if not availableLanguages or not availableSubjects %}
         Failed to get a response from the translated API. Try again later.
     {% else %}
+        {% if data and data['failedUpload'] is defined %}
+            <ul id="alerts">
+                <li><span data-icon="alert" aria-label="Error"></span> Failed to upload the asset automatically. Download the file and attach it manually below. <a class="go" href="{{ actionUrl('translated/orders/manual-download?fp=' ~ data['failedUpload']) }}">Download file</a></li>
+            </ul>
+        {% endif %}
+
         <form method="post">
 
             {{ csrfInput() }}
@@ -25,7 +31,8 @@
                     instructions: 'Add a title to this translation quote',
                     id: 'title',
                     name: 'title',
-                    required: 'required'
+                    required: 'required',
+                    value: data['projectName'] ?? ''
                 }) }}
 
                 Economy: Machine Translation with Light human review. Cheapest.<br>
@@ -74,33 +81,33 @@
                     value: data['translationSubject'] ?? 'general'
                 }) }}
 
-                {% set translationContent = data ? data['translationContent']|raw : null %}
+                {% if data and not data['translationAsset'] is defined %}
+                    {% set translationContent = data['translationContent'] is defined ? data['translationContent']|raw : null %}
 
-                {{ forms.textareaField({
-                    label: 'Content',
-                    id: 'translationContent',
-                    name: 'translationContent',
-                    required: 'required',
-                    rows: 10,
-                    value: translationContent ?? ''
-                }) }}
+                    {{ forms.textareaField({
+                        label: 'Content',
+                        id: 'translationContent',
+                        name: 'translationContent',
+                        required: 'required',
+                        rows: 10,
+                        value: translationContent
+                    }) }}
 
-                OR
-                
+                    OR
+                {% endif %}
+
+                {% set translationAsset = data['translationAsset'] is defined ? [data['translationAsset']] : null %}
                 {{ forms.elementSelect({
                     id: "translationAsset",
                     name: "translationAsset",
                     viewMode: "large",
                     elementType: elementType,
-                    criteria: {
-                        kind: ['pdf', 'plaintext', 'txt', 'xml', 'html', 'htm', 'xliff', 'zip', 'rtf', 'doc','docx', 'aea'],
-                    },
                     jsClass: 'Craft.AssetSelectInput',
                     selectionLabel: "Select file to translate",
                     sources: [],
                     limit: 1,
                     warning: false,
-                    value: data['translationAsset'] ?? null
+                    elements: translationAsset
                 }) }}
 
                 {{ forms.textField({
