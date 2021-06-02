@@ -81,7 +81,7 @@
                     value: data['translationSubject'] ?? 'general'
                 }) }}
 
-                {% if data and not data['translationAsset'] is defined %}
+                {% if not data['translationAsset'] is defined %}
                     {% set translationContent = data['translationContent'] is defined ? data['translationContent']|raw : null %}
 
                     {{ forms.textareaField({
