@@ -90,6 +90,8 @@ class OrdersController extends Controller
         $data['projectName'] = $element->title;
         $data['wordCount'] = translated::$plugin->dataService->getWordCount($element);
         $data['translationNotes'] = "Please translate text from RAW column into TRANSLATED column ONLY. \r\n";
+        $data['entryId'] = $element->id;
+        $data['auto'] = 1;
 
         $availableLanguages = translated::$plugin->utilityService->fetchAvailableLanguages($settings);
         $availableSubjects = translated::$plugin->utilityService->fetchAvailableSubjects($settings);
@@ -122,8 +124,28 @@ class OrdersController extends Controller
             readfile($filepath);
             exit();
         } else {
-            // show some sort of nice message saying couldnt get the file
+            // TODO: show some sort of nice message saying couldnt get the file
         }
+    }
+
+    public function actionGetDeliveryFile($orderId)
+    {
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/csv');
+        header('Content-Disposition: attachment; filename=' . basename($filepath));
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($filepath));
+        ob_clean();
+        flush();
+
+        readfile($filepath);
+        exit();
+    }
+
+    public function actionSyncResponse($orderId)
+    {
     }
 
     public function actionNewQuote($id = null)

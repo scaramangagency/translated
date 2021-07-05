@@ -51,10 +51,14 @@ class Order extends Model
             ['translationAsset', 'integer'],
             ['translationNotes', 'string'],
             ['translationLevel', 'string'],
+            ['translationSubject', 'string'],
+            ['translatedContent', 'string'],
             ['wordCount', 'integer'],
             ['userId', 'integer'],
             ['title', 'string'],
-            ['translationSubject', 'string'],
+
+            ['auto', 'integer'],
+            ['entryId', 'integer'],
 
             ['quoteDeliveryDate', 'date'],
             ['quoteTotal', 'float'],

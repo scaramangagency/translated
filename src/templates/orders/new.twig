@@ -127,6 +127,10 @@
                 }) }}
 
                 <input type="hidden" id="userId" name="userId" value="{{ currentUser.id }}" />
+                {% if data['entryId'] %}
+                    <input type="hidden" id="entryId" name="entryId" value="{{ data['entryId'] }}" />
+                {% endif %}
+                <input type="hidden" id="auto" name="auto" value="{{ data['auto'] ?? 0 }}" />
             {% endnamespace %}
 
             <input type="submit" class="submit btn" value="{{ 'Request Quote'|t }}">

@@ -38,7 +38,6 @@ class NeoField extends Component
             $blockId = $block->id;
 
             $data[$field->handle][$blockId] = [
-                //'type' => $block->getType()->handle,
                 'fields' => $block->getSerializedFieldValues()
             ];
         }

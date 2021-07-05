@@ -59,6 +59,9 @@ class Install extends Migration
                 'wordCount' => $this->integer(),
                 'title' => $this->text(),
 
+                'auto' => $this->integer(),
+                'entryId' => $this->integer(),
+
                 'quoteDeliveryDate' => $this->dateTime(),
                 'quoteTotal' => $this->float(),
                 'quotePID' => $this->integer(),
@@ -77,6 +80,7 @@ class Install extends Migration
         $this->addForeignKey(null, '{{%translated_orders}}', 'userId', '{{%users}}', 'id', 'CASCADE', null);
         $this->addForeignKey(null, '{{%translated_orders}}', 'reviewedBy', '{{%users}}', 'id', 'CASCADE', null);
         $this->addForeignKey(null, '{{%translated_orders}}', 'id', '{{%elements}}', 'id', 'CASCADE', null);
+        $this->addForeignKey(null, '{{%translated_orders}}', 'entryId', '{{%entries}}', 'id', 'CASCADE', null);
         $this->addForeignKey(null, '{{%translated_orders}}', 'translationAsset', '{{%assets}}', 'id', 'CASCADE', null);
     }
 

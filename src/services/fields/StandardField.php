@@ -24,6 +24,10 @@ class StandardField extends Component
 {
     public function decorateStandardData($element, $field)
     {
+        if (!$element->getFieldValue($field->handle)) {
+            return null;
+        }
+
         if ($field instanceof \craft\redactor\Field) {
             return [$field->handle => strip_tags($element->getFieldValue($field->handle)->getParsedContent())];
         } else {

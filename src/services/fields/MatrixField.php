@@ -38,7 +38,6 @@ class MatrixField extends Component
             $blockId = $block->id;
 
             $data[$field->handle][$blockId] = [
-                //'type' => $block->getType()->handle,
                 'fields' => translated::$plugin->dataService->getDataFromElement($block)
             ];
         }

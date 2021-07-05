@@ -53,7 +53,12 @@
             {% else %}
                 <h2>Translated Content</h2>
                 <hr>
-                {{ order.translatedContent|nl2br }}
+                {% if order.auto == 1 %}
+                    <a href="{{ actionUrl('translated/orders/delivery/' ~ order.id) }}" class="btn">Download Delivery Asset</a>
+                    <a href="{{ actionUrl('translated/orders/sync/' ~ order.id) }}" class="btn submit">Sync to entry</a>
+                {% else %}
+                    {{ order.translatedContent|nl2br }}
+                {% endif %}
             {% endif %}
 
         </div>
