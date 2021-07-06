@@ -146,4 +146,20 @@ class UtilityService extends Component
 
         return $decorateSubjects;
     }
+
+    public function fetchAvailableSites()
+    {
+        $sites = Craft::$app->sites->allSites;
+
+        $decorateSites = [];
+
+        foreach ($sites as $site) {
+            $decorateSites[] = [
+                'label' => $site->name,
+                'value' => $site->id
+            ];
+        }
+
+        return $decorateSites;
+    }
 }

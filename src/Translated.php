@@ -152,8 +152,8 @@ class Translated extends Plugin
                 'translated/orders/view/<id>' => 'translated/orders/view-order',
                 'translated/orders/autogenerate/<siteId>/<id>' => 'translated/orders/autogenerate',
                 'translated/orders/manual-download' => 'translated/orders/manual-download',
-                'translated/orders/delivery/<id>' => 'translated/orders/get-delivery-file',
-                'translated/orders/sync/<id>' => 'translated/orders/sync-response'
+                'translated/orders/delivery/<orderId>' => 'translated/orders/get-delivery-file',
+                'translated/orders/sync/<orderId>' => 'translated/orders/sync-response'
             ]);
         });
     }

@@ -39,7 +39,7 @@ class DataService extends Component
         $fp = fopen($filepath . DIRECTORY_SEPARATOR . $filename, 'w');
         fputcsv($fp, ['HANDLE', 'RAW', 'TRANSLATED']);
         foreach ($prepared as $key => $value) {
-            fputcsv($fp, [$key, $value, '']);
+            fputcsv($fp, [$key, preg_replace("/\r|\n/", ' ', $value), '']);
         }
         fclose($fp);
 
@@ -67,15 +67,43 @@ class DataService extends Component
         }
     }
 
-    public function consumeReturnedCSV($element, $target)
+    public function updateEntryFromTranslationCSV($data)
     {
-        //$element = get supplied csv from translated
-        $file = fopen('/Users/joshuamartin/Documents/Plugins/translated/src/web/translated.csv', 'r');
-        while (($line = fgetcsv($file)) !== false) {
-            print_r($line);
-            echo '<br>';
+        $order = translated::$plugin->orderService->getOrder($data['id']);
+
+        if (!$order) {
+            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get order'));
+            return false;
         }
-        fclose($file);
+
+        $element = Craft::$app->getElements()->getElementById($data['entryId'], null);
+        $originalElement = $this->getDataFromElement($element);
+
+        $deliveryBlob = base64_decode($order['translatedContent']);
+
+        $csvData = $deliveryBlob;
+        $lines = explode(PHP_EOL, $csvData);
+        $array = [];
+
+        $i = 0;
+
+        foreach ($lines as $line) {
+            $i++;
+            if ($i == 1) {
+                continue;
+            }
+
+            $parsed = str_getcsv($line);
+            $fieldHandle = explode('.', $parsed[0]);
+
+            if (sizeof($fieldHandle) == 1) {
+                $originalElement[$parsed[0]] = $parsed[2];
+            } else {
+                $this->setValueByDot($originalElement, $parsed[0], $parsed[2]);
+            }
+        }
+
+        return $originalElement;
     }
 
     public function getWordCount($element)
@@ -153,5 +181,16 @@ class DataService extends Component
             }
         }
         return $result;
+    }
+
+    private function setValueByDot(&$arr, $path, $value, $separator = '.')
+    {
+        $keys = explode($separator, $path);
+
+        foreach ($keys as $key) {
+            $arr = &$arr[$key];
+        }
+
+        $arr = $value;
     }
 }

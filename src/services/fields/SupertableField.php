@@ -42,6 +42,7 @@ class SupertableField extends Component
             $blockId = $block->id;
 
             $data[$field->handle][$blockId] = [
+                'type' => $blockType->id,
                 'fields' => translated::$plugin->dataService->getDataFromElement($block)
             ];
         }

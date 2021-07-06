@@ -1,57 +1,66 @@
-{% requirePermission "translated:orders" %}
+{% requirePermission 'translated:orders' %}
 
-{% extends "_layouts/cp" %}
-{% import "_includes/forms" as forms %}
-{% set title = "Request Quote" %}
+{% extends '_layouts/cp' %}
+{% import '_includes/forms' as forms %}
+{% set title = 'Request Quote' %}
 {% set selectedSubnavItem = 'orders' %}
 
 {% block actionButton %}
-    <a href="{{ cpUrl('translated/orders') }}" class="btn">{{ "Cancel"|t('translated') }}</a>
+    <a href="{{ cpUrl('translated/orders') }}" class="btn">{{ 'Cancel'|t('translated') }}</a>
 {% endblock %}
 
 {% set content %}
-    
     {% if not availableLanguages or not availableSubjects %}
         Failed to get a response from the translated API. Try again later.
     {% else %}
         {% if data and data['failedUpload'] is defined %}
             <ul id="alerts">
-                <li><span data-icon="alert" aria-label="Error"></span> Failed to upload the asset automatically. Download the file and attach it manually below. <a class="go" href="{{ actionUrl('translated/orders/manual-download?fp=' ~ data['failedUpload']) }}">Download file</a></li>
+                <li>
+                    <span data-icon="alert" aria-label="Error"></span> Failed to upload the asset automatically. Download
+                    the file and attach it manually below. <a class="go"
+                        href="{{ cpUrl('translated/orders/manual-download?fp=' ~ data['failedUpload']) }}">
+                        Download file
+                    </a>
+                </li>
             </ul>
         {% endif %}
 
         <form method="post">
-
             {{ csrfInput() }}
-            <input type="hidden" name="action" value="translated/orders/request-quote">
+            <input type="hidden" name="action" value="translated/orders/request-quote" />
 
-            {% namespace "order" %}
-                {{ forms.textField({
+            {% namespace 'order' %}
+            {{
+                forms.textField({
                     label: 'Project Name',
                     instructions: 'Add a title to this translation quote',
                     id: 'title',
                     name: 'title',
                     required: 'required',
                     value: data['projectName'] ?? ''
-                }) }}
+                })
+            }}
 
-                Economy: Machine Translation with Light human review. Cheapest.<br>
-                Professional: Human Translation with quality control. Mid-price.<br>
-                Premium: Human Translation with Specialist review and quality control. Most expensive.
+            Economy: Machine Translation with Light human review. Cheapest.<br />
+            Professional: Human Translation with quality control. Mid-price.<br />
+            Premium: Human Translation with Specialist review and quality control. Most expensive.
 
-                {{ forms.selectField({
+            {{
+                forms.selectField({
                     label: 'Translation Level',
                     id: 'translationLevel',
                     name: 'translationLevel',
                     options: {
-                        'T': 'Professional',
-                        'R': 'Premium',
-                        'P': 'Economy'
+                        T: 'Professional',
+                        R: 'Premium',
+                        P: 'Economy'
                     },
                     value: data['translationLevel'] ?? 'economy'
-                }) }}
+                })
+            }}
 
-                {{ forms.selectField({
+            {{
+                forms.selectField({
                     label: 'Source Language',
                     instructions: 'What language is your content currently written in?',
                     id: 'sourceLanguage',
@@ -59,9 +68,11 @@
                     required: 'required',
                     options: availableLanguages,
                     value: data['sourceLanguage'] ?? selectedSource ?? 'English'
-                }) }}
+                })
+            }}
 
-                {{ forms.selectField({
+            {{
+                forms.selectField({
                     label: 'Target Language',
                     instructions: 'What language do you want to translate into?',
                     id: 'targetLanguage',
@@ -70,92 +81,97 @@
                     multiple: 'multiple',
                     options: availableLanguages,
                     values: data['targetLanguage'] ?? selectedTarget ?? ''
-                }) }}
+                })
+            }}
 
-                {{ forms.selectField({
+            {{
+                forms.selectField({
                     label: 'Subject',
                     instructions: 'What industry does your content relate to?',
                     id: 'translationSubject',
                     name: 'translationSubject',
                     options: availableSubjects,
                     value: data['translationSubject'] ?? 'general'
-                }) }}
+                })
+            }}
 
-                {% if not data['translationAsset'] is defined %}
-                    {% set translationContent = data['translationContent'] is defined ? data['translationContent']|raw : null %}
+            {% if data['translationAsset'] is not defined %}
+                {% set translationContent = data['translationContent'] is defined
+                    ? data['translationContent']|raw
+                    : null
+                %}
 
-                    {{ forms.textareaField({
+                {{
+                    forms.textareaField({
                         label: 'Content',
                         id: 'translationContent',
                         name: 'translationContent',
                         required: 'required',
                         rows: 10,
                         value: translationContent
-                    }) }}
+                    })
+                }}
 
-                    OR
-                {% endif %}
+                OR
+            {% endif %}
 
-                {% set translationAsset = data['translationAsset'] is defined ? [data['translationAsset']] : null %}
-                {{ forms.elementSelect({
-                    id: "translationAsset",
-                    name: "translationAsset",
-                    viewMode: "large",
+            {% set translationAsset = data['translationAsset'] is defined ? [data['translationAsset']] : null %}
+            {{
+                forms.elementSelect({
+                    id: 'translationAsset',
+                    name: 'translationAsset',
+                    viewMode: 'large',
                     elementType: elementType,
                     jsClass: 'Craft.AssetSelectInput',
-                    selectionLabel: "Select file to translate",
+                    selectionLabel: 'Select file to translate',
                     sources: [],
                     limit: 1,
                     warning: false,
                     elements: translationAsset
-                }) }}
+                })
+            }}
 
-                {{ forms.textField({
+            {{
+                forms.textField({
                     label: 'Word count',
                     id: 'wordCount',
                     name: 'wordCount',
                     required: 'required',
                     value: data['wordCount'] ?? ''
-                }) }}
+                })
+            }}
 
-                {{ forms.textareaField({
+            {{
+                forms.textareaField({
                     label: 'Notes',
                     id: 'translationNotes',
                     name: 'translationNotes',
                     required: 'required',
                     value: data['translationNotes'] ?? ''
-                }) }}
+                })
+            }}
 
-                <input type="hidden" id="userId" name="userId" value="{{ currentUser.id }}" />
-                {% if data['entryId'] %}
-                    <input type="hidden" id="entryId" name="entryId" value="{{ data['entryId'] }}" />
-                {% endif %}
-                <input type="hidden" id="auto" name="auto" value="{{ data['auto'] ?? 0 }}" />
+            <input type="hidden" id="userId" name="userId" value="{{ currentUser.id }}" />
+            {% if data['entryId'] %}
+                <input type="hidden" id="entryId" name="entryId" value="{{ data['entryId'] }}" />
+            {% endif %}
+            <input type="hidden" id="auto" name="auto" value="{{ data['auto'] ?? 0 }}" />
             {% endnamespace %}
 
-            <input type="submit" class="submit btn" value="{{ 'Request Quote'|t }}">
+            <input type="submit" class="submit btn" value="{{ 'Request Quote'|t }}" />
         </form>
     {% endif %}
 {% endset %}
 
-
 {% js %}
-    let countInput = document.querySelector('#order-translationContent');
-    let countArea = document.querySelector('#order-wordCount');
-    
-    function handleCount(e) {
-        let c = e.value.trim();
-        if (!c) return 0;
+    let countInput = document.querySelector('#order-translationContent'); let countArea =
+    document.querySelector('#order-wordCount');
 
-        let counter = c.split(/\s+/).length;
-        countArea.value = counter;
-    }
+    function handleCount(e) { let c = e.value.trim(); if (!c) return 0;
 
-    countInput.addEventListener('keyup', (e) => {
-        handleCount(e.currentTarget);
-    });
+    let counter = c.split(/\s+/).length; countArea.value = counter; }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        handleCount(countInput);
-    });
+    countInput.addEventListener('keyup', (e) => { handleCount(e.currentTarget); });
+
+    document.addEventListener("DOMContentLoaded", () => { handleCount(countInput); });
 {% endjs %}

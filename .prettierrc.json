@@ -5,5 +5,13 @@
     "singleQuote": true,
     "printWidth": 120,
     "phpVersion": "7.4",
-    "trailingCommaPHP": false
+    "trailingCommaPHP": false,
+    "twigPrintWidth": 120,
+    "twigMultiTags": [
+        "nav,endnav",
+        "switch,case,default,endswitch",
+        "ifchildren,endifchildren",
+        "cache,endcache",
+        "js,endjs"
+    ]
 }

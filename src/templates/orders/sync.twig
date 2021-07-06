@@ -1,0 +1,42 @@
+{% requirePermission 'translated:orders' %}
+
+{% extends '_layouts/cp' %}
+{% import '_includes/forms' as forms %}
+{% set title = 'Request Quote' %}
+{% set selectedSubnavItem = 'orders' %}
+
+{% block actionButton %}
+    <a href="{{ cpUrl('translated/orders') }}" class="btn">{{ 'Cancel'|t('translated') }}</a>
+{% endblock %}
+
+{% set content %}
+    <p>
+        Translated Entry: <a href="{{ craft.entries.id(data['entryId']).one().cpEditUrl }}">{{
+                craft.entries.id(data['entryId']).one().title
+            }}</a>
+    </p>
+    <form method="post">
+        {{ csrfInput() }}
+        <input type="hidden" name="action" value="translated/orders/sync-order" />
+
+        {% namespace 'order' %}
+        {{
+            forms.selectField({
+                label: 'Site',
+                instructions: 'Select which site to push the content to for this entry',
+                id: 'siteId',
+                name: 'siteId',
+                required: 'required',
+                options: availableSites
+            })
+        }}
+
+        <input type="hidden" id="id" name="id" value="{{ data['id'] }}" />
+        {% if data['entryId'] %}
+            <input type="hidden" id="entryId" name="entryId" value="{{ data['entryId'] }}" />
+        {% endif %}
+        {% endnamespace %}
+
+        <input type="submit" class="submit btn" value="{{ 'Sync content'|t }}" />
+    </form>
+{% endset %}

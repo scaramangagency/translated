@@ -17,6 +17,7 @@ use scaramangagency\translated\services\DataService;
 use Craft;
 use craft\web\Controller;
 use craft\elements\Asset;
+use craft\elements\Entry;
 use craft\helpers\UrlHelper;
 use putyourlightson\logtofile\LogToFile;
 
@@ -130,22 +131,103 @@ class OrdersController extends Controller
 
     public function actionGetDeliveryFile($orderId)
     {
+        if ($orderId) {
+            $data = translated::$plugin->orderService->getOrder($orderId);
+
+            if (!$data) {
+                Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get delivery file'));
+                return $this->redirect(Craft::$app->getRequest()->referrer);
+            }
+        }
+
+        $deliveryBlob = base64_decode($data['translatedContent']);
+        $assetId = $data['translationAsset'];
+
+        $asset = Asset::find()
+            ->id($data['translationAsset'])
+            ->one();
+
+        $type = $asset->getMimeType();
+        $ext = $asset->extension;
+
         header('Content-Description: File Transfer');
-        header('Content-Type: application/csv');
-        header('Content-Disposition: attachment; filename=' . basename($filepath));
+        header('Content-Type:' . $type);
+        header(
+            'Content-Disposition: attachment; filename=delivery_file_' .
+                $orderId .
+                '_pid#' .
+                $data['quotePID'] .
+                '.' .
+                $ext
+        );
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
-        header('Content-Length: ' . filesize($filepath));
         ob_clean();
         flush();
 
-        readfile($filepath);
+        echo $deliveryBlob;
         exit();
     }
 
     public function actionSyncResponse($orderId)
     {
+        if ($orderId) {
+            $data = translated::$plugin->orderService->getOrder($orderId);
+
+            if (!$data) {
+                Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get delivery file'));
+                return $this->redirect(Craft::$app->getRequest()->referrer);
+            }
+        }
+
+        $availableSites = translated::$plugin->utilityService->fetchAvailableSites();
+
+        return $this->renderTemplate('translated/orders/sync', [
+            'data' => $data,
+            'availableSites' => $availableSites
+        ]);
+    }
+
+    public function actionSyncOrder()
+    {
+        $data = Craft::$app->getRequest()->getBodyParam('order', []);
+        $syncData = translated::$plugin->dataService->updateEntryFromTranslationCSV($data);
+
+        if (!$syncData) {
+            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get order'));
+            return $this->redirect(Craft::$app->getRequest()->referrer);
+        }
+
+        $element = Entry::find()
+            ->id($data['entryId'])
+            ->one();
+
+        $element->siteId = 3;
+
+        if (isset($syncData['title'])) {
+            $element->title = $syncData['title'];
+            unset($syncData['title']);
+        }
+        if (isset($syncData['slug'])) {
+            $element->slug = $syncData['slug'];
+            unset($syncData['slug']);
+        }
+
+        print_r($syncData);
+        exit();
+
+        $element->setFieldValues($syncData);
+
+        $success = Craft::$app->elements->saveElement($element);
+
+        if (!$success) {
+            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to sync data to entry'));
+            return $this->redirect(Craft::$app->getRequest()->referrer);
+        } else {
+            Craft::$app->getSession()->setInfo(Craft::t('app', 'Translated data synced to entry'));
+            return $this->redirect(UrlHelper::cpUrl('translated/orders/view/' . $data['id']));
+        }
     }
 
     public function actionNewQuote($id = null)
