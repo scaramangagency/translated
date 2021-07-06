@@ -203,7 +203,7 @@ class OrdersController extends Controller
             ->id($data['entryId'])
             ->one();
 
-        $element->siteId = 3;
+        $element->siteId = $data['siteId'];
 
         if (isset($syncData['title'])) {
             $element->title = $syncData['title'];
@@ -214,9 +214,6 @@ class OrdersController extends Controller
             unset($syncData['slug']);
         }
 
-        print_r($syncData);
-        exit();
-
         $element->setFieldValues($syncData);
 
         $success = Craft::$app->elements->saveElement($element);
@@ -225,7 +222,7 @@ class OrdersController extends Controller
             Craft::$app->getSession()->setError(Craft::t('app', 'Failed to sync data to entry'));
             return $this->redirect(Craft::$app->getRequest()->referrer);
         } else {
-            Craft::$app->getSession()->setInfo(Craft::t('app', 'Translated data synced to entry'));
+            Craft::$app->getSession()->setNotice(Craft::t('app', 'Translated data synced to entry'));
             return $this->redirect(UrlHelper::cpUrl('translated/orders/view/' . $data['id']));
         }
     }

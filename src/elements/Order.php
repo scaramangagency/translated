@@ -40,6 +40,8 @@ class Order extends Element
     public $translationLevel;
     public $translationNotes;
     public $wordCount;
+    public $auto;
+    public $entryId;
 
     public $quoteDeliveryDate;
     public $quoteTotal;
@@ -251,6 +253,8 @@ class Order extends Element
         $record->translationNotes = $this->translationNotes;
         $record->userId = $this->userId;
         $record->orderStatus = $this->orderStatus;
+        $record->auto = $this->auto;
+        $record->entryId = $this->entryId;
 
         if ($this->translationAsset) {
             $record->translationAsset = $this->translationAsset[0];

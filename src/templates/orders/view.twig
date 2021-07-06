@@ -13,14 +13,12 @@
             orderPermissions
                 and order.orderStatus == 1
                 and (order.dateCreated|date('c')) > (date('-1 day')|date('c')) %}
-            <a href="{{ cpUrl('translated/orders/reject-quote?id=' ~ order.id) }}" class="btn submit secondary">
-                Reject Quote
-            </a>
-            <a href="{{ cpUrl('translated/orders/approve-quote?id=' ~ order.id) }}" class="btn submit">Approve Quote</a>
+            <a href="{{ cpUrl('translated/orders/reject/' ~ order.id) }}" class="btn submit secondary">Reject Quote</a>
+            <a href="{{ cpUrl('translated/orders/approve/' ~ order.id) }}" class="btn submit">Approve Quote</a>
         {% endif %}
 
         {% if requestQuote and order.orderStatus == 1 and (order.dateCreated|date('c')) < (date('-1 day')|date('c')) %}
-            <a href="{{ cpUrl('translated/orders/refresh-quote?id=' ~ order.id) }}" class="btn submit">Refresh Quote</a>
+            <a href="{{ cpUrl('translated/orders/refresh/' ~ order.id) }}" class="btn submit">Refresh Quote</a>
         {% endif %}
     </div>
 {% endblock %}

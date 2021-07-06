@@ -149,8 +149,12 @@ class Translated extends Plugin
                 'translated/orders' => 'translated/orders/index',
                 'translated/orders/new' => 'translated/orders/new-quote',
                 'translated/orders/duplicate/<id>' => 'translated/orders/new-quote',
-                'translated/orders/view/<id>' => 'translated/orders/view-order',
+                'translated/orders/reject/<id>' => 'translated/orders/reject-quote',
+                'translated/orders/approve/<id>' => 'translated/orders/approve-quote',
+                'translated/orders/refresh/<id>' => 'translated/orders/refresh-quote',
                 'translated/orders/autogenerate/<siteId>/<id>' => 'translated/orders/autogenerate',
+
+                'translated/orders/view/<id>' => 'translated/orders/view-order',
                 'translated/orders/manual-download' => 'translated/orders/manual-download',
                 'translated/orders/delivery/<orderId>' => 'translated/orders/get-delivery-file',
                 'translated/orders/sync/<orderId>' => 'translated/orders/sync-response'

@@ -111,6 +111,8 @@ class OrderService extends Component
         $orderRecord->translationSubject = $data['translationSubject'];
         $orderRecord->translationNotes = $data['translationNotes'];
         $orderRecord->userId = $data['userId'];
+        $orderRecord->auto = $data['auto'];
+        $orderRecord->entryId = $data['entryId'];
 
         if ($data['translationAsset']) {
             $orderRecord->translationAsset = $data['translationAsset'];

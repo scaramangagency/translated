@@ -177,7 +177,9 @@ class DataService extends Component
             if (is_array($value)) {
                 $result = $result + $this->flatten($value, $prefix . $key . '.');
             } else {
-                $result[$prefix . $key] = $value;
+                if ($key != 'type') {
+                    $result[$prefix . $key] = $value;
+                }
             }
         }
         return $result;
