@@ -216,7 +216,7 @@ class OrdersController extends Controller
 
         $element->setFieldValues($syncData);
 
-        $success = Craft::$app->elements->saveElement($element);
+        $success = Craft::$app->elements->saveElement($element, true, false);
 
         if (!$success) {
             Craft::$app->getSession()->setError(Craft::t('app', 'Failed to sync data to entry'));
