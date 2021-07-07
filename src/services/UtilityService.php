@@ -64,6 +64,9 @@ class UtilityService extends Component
         }
 
         $decorateLanguages = [];
+
+        $decorateLanguages[] = ['label' => 'Please select...', 'value' => ''];
+
         $selectedSource = '';
         $selectedTarget = [];
 

@@ -82,6 +82,13 @@ class Order extends Element
         return new OrderQuery(static::class);
     }
 
+    protected function defineRules(): array
+    {
+        $rules = parent::defineRules();
+        $rules[] = [['sourceLanguage', 'targetLanguage', 'wordCount', 'title'], 'required'];
+        return $rules;
+    }
+
     protected static function defineSources(string $context = null): array
     {
         $sources = [

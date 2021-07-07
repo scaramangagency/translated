@@ -46,16 +46,14 @@ class Order extends Model
     public function rules()
     {
         return [
-            [['sourceLanguage', 'targetLanguage'], 'required'],
+            [['sourceLanguage', 'targetLanguage', 'wordCount', 'title'], 'required'],
             ['translationContent', 'string'],
             ['translationAsset', 'integer'],
             ['translationNotes', 'string'],
             ['translationLevel', 'string'],
             ['translationSubject', 'string'],
             ['translatedContent', 'string'],
-            ['wordCount', 'integer'],
             ['userId', 'integer'],
-            ['title', 'string'],
 
             ['auto', 'integer'],
             ['entryId', 'integer'],

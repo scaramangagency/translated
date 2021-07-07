@@ -13,6 +13,7 @@ namespace scaramangagency\translated\controllers;
 use scaramangagency\translated\Translated;
 use scaramangagency\translated\services\DataService;
 use scaramangagency\translated\services\UtilityService;
+use scaramangagency\translated\elements\Order as Order;
 
 use Craft;
 use craft\elements\Asset;
@@ -61,6 +62,41 @@ class OrdersController extends Controller
         ]);
     }
 
+    public function actionNewQuote($id = null, Order $errors = null)
+    {
+        $settings = translated::$plugin->getSettings();
+
+        if (!$settings['translatedUsername'] || !$settings['translatedPassword']) {
+            return $this->redirect(UrlHelper::cpUrl('translated/settings'));
+        }
+
+        if ($id) {
+            $data = translated::$plugin->orderService->getOrder($id);
+
+            if (!$data) {
+                Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get quote to duplicate'));
+                return $this->redirect(UrlHelper::cpUrl('translated/orders'));
+            }
+        }
+
+        $availableLanguages = translated::$plugin->utilityService->fetchAvailableLanguages($settings);
+        $availableSubjects = translated::$plugin->utilityService->fetchAvailableSubjects($settings);
+
+        if (!$errors) {
+            $errors = new Order();
+        }
+
+        return $this->renderTemplate('translated/orders/new', [
+            'availableLanguages' => $availableLanguages['optionList'],
+            'availableSubjects' => $availableSubjects,
+            'elementType' => Asset::class,
+            'selectedSource' => $availableLanguages['selectedSource'],
+            'selectedTarget' => $availableLanguages['selectedTarget'],
+            'data' => $data ?? null,
+            'err' => $errors
+        ]);
+    }
+
     public function actionAutogenerate($id, $siteId)
     {
         $settings = translated::$plugin->getSettings();
@@ -105,6 +141,143 @@ class OrdersController extends Controller
             'selectedSource' => $availableLanguages['selectedSource'],
             'selectedTarget' => $availableLanguages['selectedTarget'],
             'data' => $data ?? null
+        ]);
+    }
+
+    public function actionRequestQuote()
+    {
+        $data = Craft::$app->getRequest()->getBodyParam('order', []);
+        $quoteId = translated::$plugin->orderService->handleQuote($data);
+
+        if (!$quoteId['success'] && array_key_exists('errors', $quoteId)) {
+            Craft::$app->getSession()->setError(Craft::t('app', 'Could not save quote'));
+
+            Craft::$app->getUrlManager()->setRouteParams([
+                'errors' => $quoteId['errors']
+            ]);
+
+            return null;
+        }
+
+        if (!$quoteId['success']) {
+            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to generate quote'));
+            return $this->redirect(UrlHelper::cpUrl('translated/orders'));
+        }
+
+        return $this->redirect(UrlHelper::cpUrl('translated/orders/view/' . $quoteId['response']));
+    }
+
+    public function actionApproveQuote($id)
+    {
+        $approveQuote = translated::$plugin->orderService->approveQuote($id);
+
+        if (!$approveQuote) {
+            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to authorise order'));
+            return $this->redirect(UrlHelper::cpUrl('translated/orders'));
+        }
+
+        Craft::$app->getSession()->setNotice(Craft::t('app', 'Quote converted to order'));
+        return $this->redirect(UrlHelper::cpUrl('translated/orders'));
+    }
+
+    public function actionRefreshQuote($id)
+    {
+        $getQuote = translated::$plugin->orderService->handleQuote(null, $id);
+
+        if (!$getQuote) {
+            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to refresh quote'));
+            return $this->redirect(UrlHelper::cpUrl('translated/orders'));
+        }
+
+        Craft::$app->getSession()->setNotice(Craft::t('app', 'Quote successfully refreshed'));
+        return $this->redirect(UrlHelper::cpUrl('translated/orders/view/' . $id));
+    }
+
+    public function actionRejectQuote($id)
+    {
+        $rejectQuote = translated::$plugin->orderService->rejectQuote($id);
+
+        if (!$rejectQuote) {
+            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to reject quote'));
+            return $this->redirect(UrlHelper::cpUrl('translated/orders'));
+        }
+
+        Craft::$app->getSession()->setNotice(Craft::t('app', 'Quote successfully rejected'));
+        return $this->redirect(UrlHelper::cpUrl('translated/orders'));
+    }
+
+    public function actionViewOrder(int $id)
+    {
+        $order = translated::$plugin->orderService->getOrder($id);
+
+        if (!$order) {
+            Craft::$app->getSession()->setError(Craft::t('app', 'An order does not exist with that ID'));
+            return $this->redirect(UrlHelper::cpUrl('translated/orders'));
+        }
+
+        $user = Craft::$app->getUser();
+        if ($user->checkPermission('translated:orders:sendquotes')) {
+            $orderPermissions = true;
+        }
+        if ($user->checkPermission('translated:orders:makequotes')) {
+            $requestQuote = true;
+        }
+
+        switch ($order->orderStatus) {
+            case 1:
+                $dd = new \DateTime();
+                $dd->modify('-1 day');
+
+                $dt = new \DateTime($order->dateCreated);
+
+                if ($dt->format('c') > $dd->format('c')) {
+                    $status = 'Pending';
+                } else {
+                    $status = 'Expired';
+                }
+                break;
+            case 2:
+                $status = 'Processing';
+                break;
+            case 3:
+                $status = 'Delivered';
+                break;
+            case 4:
+                $status = 'Rejected';
+                break;
+        }
+
+        switch ($order->translationLevel) {
+            case 'T':
+                $service = 'Professional';
+                break;
+            case 'R':
+                $service = 'Premium';
+                break;
+            case 'P':
+                $service = 'Economy';
+                break;
+        }
+
+        if ($order->orderStatus > 1) {
+            $orderStatusFromHTS = (array) translated::$plugin->orderService->getOrderStatus($id);
+            $orderStatusFromHTS = (array) $orderStatusFromHTS[0];
+        }
+
+        $user = Craft::$app->getUser();
+        if ($user->checkPermission('translated:orders:syncdata')) {
+            $syncOrder = true;
+        }
+
+        return $this->renderTemplate('translated/orders/view', [
+            'order' => $order,
+            'orderPermissions' => $orderPermissions ?? false,
+            'requestQuote' => $requestQuote ?? false,
+            'statusFlag' => '<span class="label order-status ' . strtolower($status) . '">' . $status . '</span>',
+            'serviceLevel' => '<span class="label order-service ' . strtolower($service) . '">' . $service . '</span>',
+            'orderStatusFromHTS' => $orderStatusFromHTS ?? null,
+            'inSandbox' => translated::$plugin->getSettings()->translatedSandbox,
+            'syncOrder' => $syncOrder ?? false
         ]);
     }
 
@@ -226,163 +399,6 @@ class OrdersController extends Controller
             Craft::$app->getSession()->setNotice(Craft::t('app', 'Translated data synced to entry'));
             return $this->redirect(UrlHelper::cpUrl('translated/orders/view/' . $data['id']));
         }
-    }
-
-    public function actionNewQuote($id = null)
-    {
-        $settings = translated::$plugin->getSettings();
-
-        if (!$settings['translatedUsername'] || !$settings['translatedPassword']) {
-            return $this->redirect(UrlHelper::cpUrl('translated/settings'));
-        }
-
-        if ($id) {
-            $data = translated::$plugin->orderService->getOrder($id);
-
-            if (!$data) {
-                Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get quote to duplicate'));
-                return $this->redirect(UrlHelper::cpUrl('translated/orders'));
-            }
-        }
-
-        $availableLanguages = translated::$plugin->utilityService->fetchAvailableLanguages($settings);
-        $availableSubjects = translated::$plugin->utilityService->fetchAvailableSubjects($settings);
-
-        return $this->renderTemplate('translated/orders/new', [
-            'availableLanguages' => $availableLanguages['optionList'],
-            'availableSubjects' => $availableSubjects,
-            'elementType' => Asset::class,
-            'selectedSource' => $availableLanguages['selectedSource'],
-            'selectedTarget' => $availableLanguages['selectedTarget'],
-            'data' => $data ?? null
-        ]);
-    }
-
-    public function actionViewOrder(int $id)
-    {
-        $order = translated::$plugin->orderService->getOrder($id);
-
-        if (!$order) {
-            Craft::$app->getSession()->setError(Craft::t('app', 'An order does not exist with that ID'));
-            return $this->redirect(UrlHelper::cpUrl('translated/orders'));
-        }
-
-        $user = Craft::$app->getUser();
-        if ($user->checkPermission('translated:orders:sendquotes')) {
-            $orderPermissions = true;
-        }
-        if ($user->checkPermission('translated:orders:makequotes')) {
-            $requestQuote = true;
-        }
-
-        switch ($order->orderStatus) {
-            case 1:
-                $dd = new \DateTime();
-                $dd->modify('-1 day');
-
-                $dt = new \DateTime($order->dateCreated);
-
-                if ($dt->format('c') > $dd->format('c')) {
-                    $status = 'Pending';
-                } else {
-                    $status = 'Expired';
-                }
-                break;
-            case 2:
-                $status = 'Processing';
-                break;
-            case 3:
-                $status = 'Delivered';
-                break;
-            case 4:
-                $status = 'Rejected';
-                break;
-        }
-
-        switch ($order->translationLevel) {
-            case 'T':
-                $service = 'Professional';
-                break;
-            case 'R':
-                $service = 'Premium';
-                break;
-            case 'P':
-                $service = 'Economy';
-                break;
-        }
-
-        if ($order->orderStatus > 1) {
-            $orderStatusFromHTS = (array) translated::$plugin->orderService->getOrderStatus($id);
-            $orderStatusFromHTS = (array) $orderStatusFromHTS[0];
-        }
-
-        $user = Craft::$app->getUser();
-        if ($user->checkPermission('translated:orders:syncdata')) {
-            $syncOrder = true;
-        }
-
-        return $this->renderTemplate('translated/orders/view', [
-            'order' => $order,
-            'orderPermissions' => $orderPermissions ?? false,
-            'requestQuote' => $requestQuote ?? false,
-            'statusFlag' => '<span class="label order-status ' . strtolower($status) . '">' . $status . '</span>',
-            'serviceLevel' => '<span class="label order-service ' . strtolower($service) . '">' . $service . '</span>',
-            'orderStatusFromHTS' => $orderStatusFromHTS ?? null,
-            'inSandbox' => translated::$plugin->getSettings()->translatedSandbox,
-            'syncOrder' => $syncOrder ?? false
-        ]);
-    }
-
-    public function actionRequestQuote()
-    {
-        $data = Craft::$app->getRequest()->getBodyParam('order', []);
-        $quoteId = translated::$plugin->orderService->handleQuote($data);
-
-        if (!$quoteId) {
-            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to generate quote'));
-            return $this->redirect(UrlHelper::cpUrl('translated/orders'));
-        }
-
-        return $this->redirect(UrlHelper::cpUrl('translated/orders/view/' . $quoteId));
-    }
-
-    public function actionApproveQuote($id)
-    {
-        $approveQuote = translated::$plugin->orderService->approveQuote($id);
-
-        if (!$approveQuote) {
-            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to authorise order'));
-            return $this->redirect(UrlHelper::cpUrl('translated/orders'));
-        }
-
-        Craft::$app->getSession()->setNotice(Craft::t('app', 'Quote converted to order'));
-        return $this->redirect(UrlHelper::cpUrl('translated/orders'));
-    }
-
-    public function actionRefreshQuote($id)
-    {
-        $getQuote = translated::$plugin->orderService->handleQuote(null, $id);
-
-        if (!$getQuote) {
-            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to refresh quote'));
-            return $this->redirect(UrlHelper::cpUrl('translated/orders'));
-        }
-
-        Craft::$app->getSession()->setNotice(Craft::t('app', 'Quote successfully refreshed'));
-        return $this->redirect(UrlHelper::cpUrl('translated/orders/view/' . $id));
-    }
-
-    public function actionRejectQuote($id)
-    {
-        $rejectQuote = translated::$plugin->orderService->rejectQuote($id);
-
-        if (!$rejectQuote) {
-            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to reject quote'));
-            return $this->redirect(UrlHelper::cpUrl('translated/orders'));
-        }
-
-        Craft::$app->getSession()->setNotice(Craft::t('app', 'Quote successfully rejected'));
-        return $this->redirect(UrlHelper::cpUrl('translated/orders'));
     }
 
     public function actionWebhook()

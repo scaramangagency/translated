@@ -113,6 +113,11 @@ class Translated extends Plugin
         return new Settings();
     }
 
+    protected function createOrderModel()
+    {
+        return new Order();
+    }
+
     protected function settingsHtml(): string
     {
         return Craft::$app->view->renderTemplate('translated/settings');

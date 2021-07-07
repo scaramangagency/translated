@@ -63,3 +63,44 @@
 .mb-8 {
     margin-bottom: 8px;
 }
+
+.booking-form {
+    width: 80%;
+    margin: 24px auto;
+}
+
+.booking-form .full {
+    width: 100%;
+    margin-bottom: 24px;
+}
+
+.booking-form .select.full {
+    margin-bottom: 0;
+}
+.booking-form .select.full > select {
+    width: 100%;
+}
+
+.booking-form .half {
+    width: 50%;
+    margin-bottom: 24px;
+}
+
+.booking-form .half + .half {
+    padding-left: 16px;
+}
+
+.booking-form .row {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.booking-form .row.center {
+    align-items: center;
+}
+
+.booking-form .service-level {
+    color: #676767;
+    margin-top: 16px;
+    font-style: italic;
+}

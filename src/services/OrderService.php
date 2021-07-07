@@ -121,9 +121,10 @@ class OrderService extends Component
             $orderRecord->translationContent = $data['translationContent'];
         }
 
-        if (!Craft::$app->getElements()->saveElement($orderRecord)) {
-            LogToFile::error('[Order][Quote] Failed to save the order record', 'translated');
-            return false;
+        $success = Craft::$app->getElements()->saveElement($orderRecord, true);
+
+        if (!$success) {
+            return ['success' => false, 'errors' => $orderRecord];
         }
 
         $params = [
@@ -163,7 +164,7 @@ class OrderService extends Component
             curl_close($ch);
         } catch (Exception $e) {
             LogToFile::error('[Order][Quote] Failed to generate a quote', 'translated');
-            return false;
+            return ['success' => false, 'response' => 'translatedApi'];
         }
 
         $res = json_decode($res);
@@ -173,7 +174,7 @@ class OrderService extends Component
                 '[Order][Quote] translated API returned an error when generating a quote. Error: ' . $res->message,
                 'translated'
             );
-            return false;
+            return ['success' => false, 'response' => 'translatedApi'];
         }
 
         $success = $this->_attachQuote($orderRecord->id, $res);
@@ -183,10 +184,10 @@ class OrderService extends Component
                 '[Order][Quote] Failed to update the order record with the quote information from translated',
                 'translated'
             );
-            return false;
+            return ['success' => false, 'response' => 'translatedApi'];
         }
 
-        return $orderRecord->id;
+        return ['success' => true, 'response' => $orderRecord->id];
     }
 
     public function approveQuote($id)

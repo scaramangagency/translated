@@ -2,7 +2,7 @@
 
 {% extends '_layouts/cp' %}
 {% import '_includes/forms' as forms %}
-{% set title = 'Request Quote' %}
+{% set title = 'Generate a new quote' %}
 {% set selectedSubnavItem = 'orders' %}
 
 {% block actionButton %}
@@ -25,131 +25,169 @@
             </ul>
         {% endif %}
 
-        <form method="post">
+        <form method="post" class="booking-form">
             {{ csrfInput() }}
             <input type="hidden" name="action" value="translated/orders/request-quote" />
 
             {% namespace 'order' %}
-            {{
-                forms.textField({
-                    label: 'Project Name',
-                    instructions: 'Add a title to this translation quote',
-                    id: 'title',
-                    name: 'title',
-                    required: 'required',
-                    value: data['projectName'] ?? ''
-                })
-            }}
-
-            Economy: Machine Translation with Light human review. Cheapest.<br />
-            Professional: Human Translation with quality control. Mid-price.<br />
-            Premium: Human Translation with Specialist review and quality control. Most expensive.
-
-            {{
-                forms.selectField({
-                    label: 'Translation Level',
-                    id: 'translationLevel',
-                    name: 'translationLevel',
-                    options: {
-                        T: 'Professional',
-                        R: 'Premium',
-                        P: 'Economy'
-                    },
-                    value: data['translationLevel'] ?? 'economy'
-                })
-            }}
-
-            {{
-                forms.selectField({
-                    label: 'Source Language',
-                    instructions: 'What language is your content currently written in?',
-                    id: 'sourceLanguage',
-                    name: 'sourceLanguage',
-                    required: 'required',
-                    options: availableLanguages,
-                    value: data['sourceLanguage'] ?? selectedSource ?? 'English'
-                })
-            }}
-
-            {{
-                forms.selectField({
-                    label: 'Target Language',
-                    instructions: 'What language do you want to translate into?',
-                    id: 'targetLanguage',
-                    name: 'targetLanguage',
-                    required: 'required',
-                    multiple: 'multiple',
-                    options: availableLanguages,
-                    values: data['targetLanguage'] ?? selectedTarget ?? ''
-                })
-            }}
-
-            {{
-                forms.selectField({
-                    label: 'Subject',
-                    instructions: 'What industry does your content relate to?',
-                    id: 'translationSubject',
-                    name: 'translationSubject',
-                    options: availableSubjects,
-                    value: data['translationSubject'] ?? 'general'
-                })
-            }}
-
-            {% if data['translationAsset'] is not defined %}
-                {% set translationContent = data['translationContent'] is defined
-                    ? data['translationContent']|raw
-                    : null
-                %}
-
+            <div class="full">
                 {{
-                    forms.textareaField({
-                        label: 'Content',
-                        id: 'translationContent',
-                        name: 'translationContent',
+                    forms.textField({
+                        label: 'Project Name',
+                        instructions: 'Add a title to this translation quote',
+                        id: 'title',
+                        name: 'title',
                         required: 'required',
-                        rows: 10,
-                        value: translationContent
+                        value: data['projectName'] ?? '',
+                        errors: err.getErrors('title')
                     })
                 }}
+            </div>
 
-                OR
+            <div class="row center">
+                <div class="half">
+                    {{
+                        forms.selectField({
+                            label: 'Translation Level',
+                            id: 'translationLevel',
+                            name: 'translationLevel',
+                            options: {
+                                T: '[£££] Professional',
+                                R: '[££] Premium',
+                                P: '[£] Economy'
+                            },
+                            class: 'full',
+                            value: data['translationLevel'] ?? 'economy'
+                        })
+                    }}
+                </div>
+                <div class="half service-level">
+                    <div class="hidden" data-id="p">
+                        Machine Translation with light human review.
+                    </div>
+                    <div class="hidden" data-id="r">
+                        Human Translation with quality control.
+                    </div>
+                    <div data-id="t">
+                        Human Translation with specialist review and quality control.
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="half">
+                    {{
+                        forms.selectField({
+                            label: 'Source Language',
+                            instructions: 'What language is your content currently written in?',
+                            id: 'sourceLanguage',
+                            name: 'sourceLanguage',
+                            required: 'required',
+                            class: 'full',
+                            options: availableLanguages,
+                            value: data['sourceLanguage'] ?? selectedSource ?? 'English',
+                            errors: err.getErrors('sourceLanguage') ?? null
+                        })
+                    }}
+                </div>
+                <div class="half">
+                    {{
+                        forms.selectField({
+                            label: 'Target Language',
+                            instructions: 'What language do you want to translate into?',
+                            id: 'targetLanguage',
+                            name: 'targetLanguage',
+                            required: 'required',
+                            multiple: 'multiple',
+                            class: 'full',
+                            options: availableLanguages,
+                            values: data['targetLanguage'] ?? selectedTarget ?? '',
+                            errors: err.getErrors('targetLanguage') ?? null
+                        })
+                    }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="half">
+                    {{
+                        forms.selectField({
+                            label: 'Subject',
+                            instructions: 'What industry does your content relate to?',
+                            id: 'translationSubject',
+                            name: 'translationSubject',
+                            options: availableSubjects,
+                            class: 'full',
+                            value: data['translationSubject'] ?? 'general'
+                        })
+                    }}
+                </div>
+                <div class="half">
+                    {{
+                        forms.textField({
+                            label: 'Word count',
+                            instructions: 'Provide manually if uploading an asset, otherwise automatically calculated',
+                            id: 'wordCount',
+                            name: 'wordCount',
+                            required: 'required',
+                            value: data['wordCount'] ?? '',
+                            errors: err.getErrors('wordCount') ?? null
+                        })
+                    }}
+                </div>
+            </div>
+
+            <div class="full">
+                {{
+                    forms.textareaField({
+                        label: 'Notes',
+                        instructions: 'Provide notes or instructions to the translator',
+                        id: 'translationNotes',
+                        name: 'translationNotes',
+                        value: data['translationNotes'] ?? ''
+                    })
+                }}
+            </div>
+
+            {% if data['translationAsset'] is not defined %}
+                <div class="full">
+                    {% set translationContent = data['translationContent'] is defined
+                        ? data['translationContent']|raw
+                        : null
+                    %}
+
+                    {{
+                        forms.textareaField({
+                            label: 'Content',
+                            id: 'translationContent',
+                            name: 'translationContent',
+                            required: 'required',
+                            rows: 10,
+                            value: translationContent
+                        })
+                    }}
+                </div>
+                <div class="full">
+                    <strong>OR</strong>
+                </div>
             {% endif %}
 
-            {% set translationAsset = data['translationAsset'] is defined ? [data['translationAsset']] : null %}
-            {{
-                forms.elementSelect({
-                    id: 'translationAsset',
-                    name: 'translationAsset',
-                    viewMode: 'large',
-                    elementType: elementType,
-                    jsClass: 'Craft.AssetSelectInput',
-                    selectionLabel: 'Select file to translate',
-                    sources: [],
-                    limit: 1,
-                    warning: false,
-                    elements: translationAsset
-                })
-            }}
-
-            {{
-                forms.textField({
-                    label: 'Word count',
-                    id: 'wordCount',
-                    name: 'wordCount',
-                    required: 'required',
-                    value: data['wordCount'] ?? ''
-                })
-            }}
-
-            {{
-                forms.textareaField({
-                    label: 'Notes',
-                    id: 'translationNotes',
-                    name: 'translationNotes',
-                    required: 'required',
-                    value: data['translationNotes'] ?? ''
-                })
-            }}
+            <div class="full">
+                {% set translationAsset = data['translationAsset'] is defined ? [data['translationAsset']] : null %}
+                {{
+                    forms.elementSelect({
+                        id: 'translationAsset',
+                        name: 'translationAsset',
+                        viewMode: 'large',
+                        elementType: elementType,
+                        jsClass: 'Craft.AssetSelectInput',
+                        selectionLabel: 'Select file to translate',
+                        sources: [],
+                        limit: 1,
+                        warning: false,
+                        elements: translationAsset
+                    })
+                }}
+            </div>
 
             <input type="hidden" id="userId" name="userId" value="{{ currentUser.id }}" />
             {% if data['entryId'] is defined %}
@@ -164,14 +202,35 @@
 {% endset %}
 
 {% js %}
-    let countInput = document.querySelector('#order-translationContent'); let countArea =
-    document.querySelector('#order-wordCount');
+    {# prettier-ignore-start #}
+        const countInput = document.querySelector('#order-translationContent');
+        const countArea = document.querySelector('#order-wordCount');
 
-    function handleCount(e) { let c = e.value.trim(); if (!c) return 0;
+        function handleCount(e) { 
+            const c = e.value.trim(); 
+            if (!c) return 0;
+            
+            const counter = c.split(/\s+/).length; 
+            countArea.value = counter;
+        }
 
-    let counter = c.split(/\s+/).length; countArea.value = counter; }
+        countInput.addEventListener('keyup', (e) => {
+            handleCount(e.currentTarget);
+        });
 
-    countInput.addEventListener('keyup', (e) => { handleCount(e.currentTarget); });
+        document.addEventListener("DOMContentLoaded", () => { 
+            handleCount(countInput);
+        });
 
-    document.addEventListener("DOMContentLoaded", () => { handleCount(countInput); });
+        const serviceLevel = document.querySelector('#order-translationLevel');
+        serviceLevel.addEventListener('change', (e) => {
+            let selectedOption = e.target.value.toLowerCase();
+
+            document.querySelectorAll('.service-level div').forEach(evt => {
+                evt.classList.add('hidden');
+            });
+            document.querySelector('[data-id="' + selectedOption + '"]').classList.remove('hidden');
+        });
+
+    {# prettier-ignore-end #}
 {% endjs %}
