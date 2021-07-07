@@ -8,10 +8,10 @@ use scaramangagency\translated\records\OrderRecord as OrderRecord;
 
 use Craft;
 use craft\base\Element;
+use craft\elements\User;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\Html;
 use craft\helpers\UrlHelper;
-use craft\elements\User;
 
 class Order extends Element
 {

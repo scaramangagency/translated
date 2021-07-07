@@ -1,23 +1,23 @@
 <?php
 namespace scaramangagency\translated;
 
-use scaramangagency\translated\services\Order as OrderService;
-use scaramangagency\translated\models\Settings;
 use scaramangagency\translated\elements\Order;
+use scaramangagency\translated\models\Settings;
+use scaramangagency\translated\services\Order as OrderService;
 use scaramangagency\translated\web\TranslatedAsset;
 
 use Craft;
 use craft\base\Plugin;
-use craft\services\Plugins;
-use craft\services\UserPermissions;
-use craft\services\Elements;
 use craft\events\PluginEvent;
-use craft\web\UrlManager;
-use craft\helpers\UrlHelper;
-use craft\web\View;
+use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
-use craft\events\RegisterComponentTypesEvent;
+use craft\helpers\UrlHelper;
+use craft\services\Elements;
+use craft\services\Plugins;
+use craft\services\UserPermissions;
+use craft\web\UrlManager;
+use craft\web\View;
 
 use yii\base\Event;
 
@@ -188,6 +188,9 @@ class Translated extends Plugin
                         ],
                         'translated:orders:sendquotes' => [
                             'label' => Craft::t('translated', 'Authorise quotes')
+                        ],
+                        'translated:orders:syncdata' => [
+                            'label' => Craft::t('translated', 'Sync data')
                         ]
                     ]
                 ]
@@ -202,11 +205,13 @@ class Translated extends Plugin
             $view->registerAssetBundle(TranslatedAsset::class);
         });
 
-        Craft::$app->getView()->hook('cp.entries.edit.details', function (array &$context) {
+        Craft::$app->getView()->hook('cp.entries.edit.settings', function (array &$context) {
             $entry = $context['entry'];
             $generateUrl = UrlHelper::cpUrl('translated/orders/autogenerate/' . $entry->siteId . '/' . $entry->id);
 
-            return '<a href="' . $generateUrl . '" class="btn tertiary full">Translate entry</a>';
+            return '<div id="translate-field" class="field"> <a href="' .
+                $generateUrl .
+                '" class="btn submit translate"><div class="t9n-indicator" data-icon="language"></div> Translate entry</a></div>';
         });
     }
 }

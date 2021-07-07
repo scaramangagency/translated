@@ -9,19 +9,13 @@
  * @package   Translated
  * @since     1.0.0
  */
-.btn.tertiary {
-    border: 1px solid #b7252f;
-    color: #b7252f;
-    background-color: transparent;
-}
-
-.btn.tertiary.full {
+.btn.translate {
     width: 100%;
+    margin: 16px 0;
 }
 
-.btn.tertiary:hover {
-    background-color: #b7252f;
-    color: white;
+.btn.translate .t9n-indicator {
+    padding-right: 6px;
 }
 
 .label.order-status,

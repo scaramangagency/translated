@@ -11,14 +11,15 @@
 namespace scaramangagency\translated\controllers;
 
 use scaramangagency\translated\Translated;
-use scaramangagency\translated\services\UtilityService;
 use scaramangagency\translated\services\DataService;
+use scaramangagency\translated\services\UtilityService;
 
 use Craft;
-use craft\web\Controller;
 use craft\elements\Asset;
 use craft\elements\Entry;
 use craft\helpers\UrlHelper;
+use craft\web\Controller;
+
 use putyourlightson\logtofile\LogToFile;
 
 /**
@@ -310,8 +311,14 @@ class OrdersController extends Controller
                 break;
         }
 
-        if ($order->orderStatus == 2) {
-            $orderStatusFromHTS = translated::$plugin->orderService->getOrderStatus($id);
+        if ($order->orderStatus > 1) {
+            $orderStatusFromHTS = (array) translated::$plugin->orderService->getOrderStatus($id);
+            $orderStatusFromHTS = (array) $orderStatusFromHTS[0];
+        }
+
+        $user = Craft::$app->getUser();
+        if ($user->checkPermission('translated:orders:syncdata')) {
+            $syncOrder = true;
         }
 
         return $this->renderTemplate('translated/orders/view', [
@@ -321,7 +328,8 @@ class OrdersController extends Controller
             'statusFlag' => '<span class="label order-status ' . strtolower($status) . '">' . $status . '</span>',
             'serviceLevel' => '<span class="label order-service ' . strtolower($service) . '">' . $service . '</span>',
             'orderStatusFromHTS' => $orderStatusFromHTS ?? null,
-            'inSandbox' => translated::$plugin->getSettings()->translatedSandbox
+            'inSandbox' => translated::$plugin->getSettings()->translatedSandbox,
+            'syncOrder' => $syncOrder ?? false
         ]);
     }
 

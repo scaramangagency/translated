@@ -14,6 +14,7 @@ use scaramangagency\translated\Translated;
 
 use Craft;
 use craft\base\Component;
+
 use putyourlightson\logtofile\LogToFile;
 
 /**

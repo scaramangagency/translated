@@ -1,19 +1,13 @@
 {% requirePermission 'translated:orders' %}
-
+{% set entry = craft.entries.id(data['entryId']).one() %}
 {% extends '_layouts/cp' %}
 {% import '_includes/forms' as forms %}
-{% set title = 'Request Quote' %}
+{% set title = 'Sync content to ' ~ entry.title %}
 {% set selectedSubnavItem = 'orders' %}
-
-{% block actionButton %}
-    <a href="{{ cpUrl('translated/orders') }}" class="btn">{{ 'Cancel'|t('translated') }}</a>
-{% endblock %}
 
 {% set content %}
     <p>
-        Translated Entry: <a href="{{ craft.entries.id(data['entryId']).one().cpEditUrl }}">{{
-                craft.entries.id(data['entryId']).one().title
-            }}</a>
+        Translated Entry: <a href="{{ entry.cpEditUrl }}">{{ entry.title }}</a>
     </p>
     <form method="post">
         {{ csrfInput() }}

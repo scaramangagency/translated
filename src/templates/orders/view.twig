@@ -4,7 +4,6 @@
 {% set title = order.title %}
 {% set selectedSubnavItem = 'orders' %}
 {% do view.registerAssetBundle('scaramangagency\\translated\\web\\TranslatedAsset') %}
-
 {% block actionButton %}
     <div class="buttons">
         <a href="{{ cpUrl('translated/orders/duplicate/' ~ order.id) }}" class="btn tertiary">Duplicate Quote</a>
@@ -53,6 +52,13 @@
 {% set content %}
     {% if order.orderStatus == 2 or order.orderStatus == 3 %}
         <div id="tab-fulfilled">
+            {% if orderStatusFromHTS %}
+                <strong>Project Manager</strong><Br />
+                {{ orderStatusFromHTS.pm_name }}<br />
+                {{ orderStatusFromHTS.pm_email }}
+                <hr />
+            {% endif %}
+
             {% if order.orderStatus == 2 %}
                 {% if not orderStatusFromHTS %}
                     <p>
@@ -60,7 +66,7 @@
                     </p>
                 {% else %}
                     <p>
-                        {{ dump(orderStatusFromHTS) }}
+                        Your order is still in process. Please check back again after the delivery date has passed.
                     </p>
                 {% endif %}
             {% else %}
@@ -73,7 +79,7 @@
                         Download Delivery Asset
                     </a>
                 {% endif %}
-                {% if order.auto == 1 %}
+                {% if order.auto == 1 and syncOrder %}
                     <a href="{{ cpUrl('translated/orders/sync/' ~ order.id) }}" class="btn submit">Sync to entry</a>
                 {% else %}
                     {{ order.translatedContent|nl2br }}
@@ -152,12 +158,22 @@
 
         {% if order.orderStatus != 3 %}
             <div class="data">
-                <h4 class="heading">
-                    Delivery Date
-                </h4>
-                <div class="value">
-                    {{ order.quoteDeliveryDate|date('short') }} {{ order.quoteDeliveryDate|time('short') }}
-                </div>
+                {% if order.orderStatus == 2 and orderStatusFromHTS %}
+                    <h4 class="heading">
+                        Delivery Date
+                    </h4>
+                    <div class="value">
+                        {{ orderStatusFromHTS.delivery_date|date('short') }}
+                        {{ orderStatusFromHTS.delivery_date|time('short') }}
+                    </div>
+                {% else %}
+                    <h4 class="heading">
+                        Delivery Date
+                    </h4>
+                    <div class="value">
+                        {{ order.quoteDeliveryDate|date('short') }} {{ order.quoteDeliveryDate|time('short') }}
+                    </div>
+                {% endif %}
             </div>
         {% else %}
             <div class="data">

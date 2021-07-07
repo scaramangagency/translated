@@ -17,6 +17,7 @@ use scaramangagency\translated\records\OrderRecord as OrderRecord;
 use Craft;
 use craft\base\Component;
 use craft\elements\Asset;
+
 use putyourlightson\logtofile\LogToFile;
 
 /**
@@ -112,7 +113,7 @@ class OrderService extends Component
         $orderRecord->translationNotes = $data['translationNotes'];
         $orderRecord->userId = $data['userId'];
         $orderRecord->auto = $data['auto'];
-        $orderRecord->entryId = $data['entryId'];
+        $orderRecord->entryId = $data['entryId'] ?? null;
 
         if ($data['translationAsset']) {
             $orderRecord->translationAsset = $data['translationAsset'];
