@@ -162,7 +162,8 @@
                             name: 'translationContent',
                             required: 'required',
                             rows: 10,
-                            value: translationContent
+                            value: translationContent,
+                            errors: err.getErrors('translationContent') ?? null
                         })
                     }}
                 </div>
@@ -184,7 +185,8 @@
                         sources: [],
                         limit: 1,
                         warning: false,
-                        elements: translationAsset
+                        elements: translationAsset,
+                        errors: err.getErrors('translationAsset') ?? null
                     })
                 }}
             </div>

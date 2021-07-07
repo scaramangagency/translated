@@ -47,9 +47,7 @@ class Order extends Model
     {
         return [
             [['sourceLanguage', 'targetLanguage', 'wordCount', 'title'], 'required'],
-            ['translationContent', 'string'],
-            ['translationAsset', 'integer'],
-            ['translationNotes', 'string'],
+            [['translationContent', 'translationAsset'], 'required'],
             ['translationLevel', 'string'],
             ['translationSubject', 'string'],
             ['translatedContent', 'string'],

@@ -86,6 +86,7 @@ class Order extends Element
     {
         $rules = parent::defineRules();
         $rules[] = [['sourceLanguage', 'targetLanguage', 'wordCount', 'title'], 'required'];
+        $rules[] = [['translationAsset', 'translationContent'], 'required'];
         return $rules;
     }
 
