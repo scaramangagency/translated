@@ -402,9 +402,8 @@ class OrdersController extends Controller
 
         $element = Entry::find()
             ->id($data['entryId'])
+            ->siteId($data['siteId'])
             ->one();
-
-        $element->siteId = $data['siteId'];
 
         if (isset($syncData['title'])) {
             $element->title = $syncData['title'];
