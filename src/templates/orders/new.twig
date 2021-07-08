@@ -5,10 +5,6 @@
 {% set title = 'Generate a new quote' %}
 {% set selectedSubnavItem = 'orders' %}
 
-{% block actionButton %}
-    <a href="{{ cpUrl('translated/orders') }}" class="btn">{{ 'Cancel'|t('translated') }}</a>
-{% endblock %}
-
 {% set content %}
     {% if not availableLanguages or not availableSubjects %}
         Failed to get a response from the translated API. Try again later.
@@ -72,6 +68,7 @@
 
             <div class="row">
                 <div class="half">
+                    {# TODO: Set default selected language to primary site #}
                     {{
                         forms.selectField({
                             label: 'Source Language',
@@ -94,7 +91,6 @@
                             id: 'targetLanguage',
                             name: 'targetLanguage',
                             required: 'required',
-                            multiple: 'multiple',
                             class: 'full',
                             options: availableLanguages,
                             values: form['targetLanguage'] ?? data['targetLanguage'] ?? selectedTarget ?? '',
@@ -198,6 +194,7 @@
             {% endnamespace %}
 
             <input type="submit" class="submit btn" value="{{ 'Request Quote'|t }}" />
+            <a href="{{ cpUrl('translated/orders') }}" class="btn">{{ 'Cancel'|t('translated') }}</a>
         </form>
     {% endif %}
 {% endset %}

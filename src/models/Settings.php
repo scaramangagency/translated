@@ -29,6 +29,8 @@ class Settings extends Model
     public $translatedPassword;
     public $translatedCleanup;
     public $translatedSandbox;
+    public $translatedNotifications;
+    public $translatedNotificationEmail;
     public $translatedAutogenerationDirectory;
 
     // Public Methods
@@ -40,6 +42,8 @@ class Settings extends Model
             [['translatedUsername', 'translatedPassword'], 'required'],
             ['translatedCleanup', 'boolean'],
             ['translatedSandbox', 'boolean'],
+            ['translatedNotifications', 'boolean'],
+            ['translatedNotificationEmail', 'string'],
             ['translatedAutogenerationDirectory', 'integer']
         ];
     }
