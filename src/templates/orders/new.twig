@@ -38,7 +38,7 @@
                         id: 'title',
                         name: 'title',
                         required: 'required',
-                        value: data['projectName'] ?? '',
+                        value: form['title'] ?? data['projectName'] ?? '',
                         errors: err.getErrors('title')
                     })
                 }}
@@ -52,24 +52,20 @@
                             id: 'translationLevel',
                             name: 'translationLevel',
                             options: {
-                                T: '[£££] Professional',
+                                P: '[£] Economy',
                                 R: '[££] Premium',
-                                P: '[£] Economy'
+                                T: '[£££] Professional'
                             },
                             class: 'full',
-                            value: data['translationLevel'] ?? 'economy'
+                            value: form['translationLevel'] ?? data['translationLevel'] ?? 'economy'
                         })
                     }}
                 </div>
                 <div class="half service-level">
-                    <div class="hidden" data-id="p">
-                        Machine Translation with light human review.
-                    </div>
-                    <div class="hidden" data-id="r">
-                        Human Translation with quality control.
-                    </div>
-                    <div data-id="t">
-                        Human Translation with specialist review and quality control.
+                    <div class="info">
+                        [£] Economy – Machine Translation with light human review.<br />
+                        [££] Premium – Human Translation with quality control.<br />
+                        [£££] Professional – Human Translation with specialist review and quality control.
                     </div>
                 </div>
             </div>
@@ -85,7 +81,7 @@
                             required: 'required',
                             class: 'full',
                             options: availableLanguages,
-                            value: data['sourceLanguage'] ?? selectedSource ?? 'English',
+                            value: form['sourceLanguage'] ?? data['sourceLanguage'] ?? selectedSource ?? 'English',
                             errors: err.getErrors('sourceLanguage') ?? null
                         })
                     }}
@@ -101,7 +97,7 @@
                             multiple: 'multiple',
                             class: 'full',
                             options: availableLanguages,
-                            values: data['targetLanguage'] ?? selectedTarget ?? '',
+                            values: form['targetLanguage'] ?? data['targetLanguage'] ?? selectedTarget ?? '',
                             errors: err.getErrors('targetLanguage') ?? null
                         })
                     }}
@@ -117,7 +113,7 @@
                             name: 'translationSubject',
                             options: availableSubjects,
                             class: 'full',
-                            value: data['translationSubject'] ?? 'general'
+                            value: form['translationSubject'] ?? data['translationSubject'] ?? 'general'
                         })
                     }}
                 </div>
@@ -129,7 +125,7 @@
                             id: 'wordCount',
                             name: 'wordCount',
                             required: 'required',
-                            value: data['wordCount'] ?? '',
+                            value: form['wordCount'] ?? data['wordCount'] ?? '',
                             errors: err.getErrors('wordCount') ?? null
                         })
                     }}
@@ -143,16 +139,16 @@
                         instructions: 'Provide notes or instructions to the translator',
                         id: 'translationNotes',
                         name: 'translationNotes',
-                        value: data['translationNotes'] ?? ''
+                        value: form['translationNotes'] ?? data['translationNotes'] ?? ''
                     })
                 }}
             </div>
 
             {% if data['translationAsset'] is not defined %}
                 <div class="full">
-                    {% set translationContent = data['translationContent'] is defined
-                        ? data['translationContent']|raw
-                        : null
+                    {% set translationContent = form['translationContent'] is defined
+                        ? form['translationContent']|raw
+                        : data['translationContent'] is defined ? data['translationContent']|raw : null
                     %}
 
                     {{
@@ -161,7 +157,7 @@
                             id: 'translationContent',
                             name: 'translationContent',
                             required: 'required',
-                            rows: 10,
+                            rows: 8,
                             value: translationContent,
                             errors: err.getErrors('translationContent') ?? null
                         })
@@ -173,18 +169,21 @@
             {% endif %}
 
             <div class="full">
-                {% set translationAsset = data['translationAsset'] is defined ? [data['translationAsset']] : null %}
+                {% set translationAsset = form['translationAsset'] is defined
+                    ? [form['translationAsset']]
+                    : data['translationAsset'] is defined ? [data['translationAsset']] : null
+                %}
                 {{
-                    forms.elementSelect({
+                    forms.elementSelectField({
+                        label: 'Select file to translate',
                         id: 'translationAsset',
                         name: 'translationAsset',
                         viewMode: 'large',
                         elementType: elementType,
                         jsClass: 'Craft.AssetSelectInput',
-                        selectionLabel: 'Select file to translate',
                         sources: [],
                         limit: 1,
-                        warning: false,
+                        required: 'required',
                         elements: translationAsset,
                         errors: err.getErrors('translationAsset') ?? null
                     })
@@ -223,16 +222,5 @@
         document.addEventListener("DOMContentLoaded", () => { 
             handleCount(countInput);
         });
-
-        const serviceLevel = document.querySelector('#order-translationLevel');
-        serviceLevel.addEventListener('change', (e) => {
-            let selectedOption = e.target.value.toLowerCase();
-
-            document.querySelectorAll('.service-level div').forEach(evt => {
-                evt.classList.add('hidden');
-            });
-            document.querySelector('[data-id="' + selectedOption + '"]').classList.remove('hidden');
-        });
-
     {# prettier-ignore-end #}
 {% endjs %}

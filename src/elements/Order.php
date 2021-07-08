@@ -86,7 +86,22 @@ class Order extends Element
     {
         $rules = parent::defineRules();
         $rules[] = [['sourceLanguage', 'targetLanguage', 'wordCount', 'title'], 'required'];
-        $rules[] = [['translationAsset', 'translationContent'], 'required'];
+        $rules[] = [
+            'translationAsset',
+            'required',
+            'when' => function () {
+                return !$this->translationContent;
+            },
+            'message' => 'Please either upload an asset or supply text to be translated.'
+        ];
+        $rules[] = [
+            'translationContent',
+            'required',
+            'when' => function () {
+                return !$this->translationAsset;
+            },
+            'message' => 'Please either upload an asset or supply text to be translated.'
+        ];
         return $rules;
     }
 
@@ -206,10 +221,9 @@ class Order extends Element
     {
         switch ($this->orderStatus) {
             case 1:
-                $dd = new \DateTime();
-                $dd->modify('-1 day');
-
-                if ($this->dateCreated->format('c') > $dd->format('c')) {
+                $dd = $this->dateCreated->modify('+1 day');
+                $now = new \DateTime();
+                if ($dd->format('c') < $now->format('c')) {
                     $status = 'Pending';
                 } else {
                     $status = 'Expired';
@@ -352,7 +366,7 @@ class Order extends Element
             case 'orderStatus':
                 return $this->getStatus();
             case 'estimatedDeliveryDate':
-                return $this->getEstimatedDeliveryDate();
+                return $this->getEstimatedDeliveryDate() ?? null;
             case 'quoteTotal':
                 return \Craft::$app->getFormatter()->asCurrency($this->$attribute, 'EUR');
             case 'dateApproved':

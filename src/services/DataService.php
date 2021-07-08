@@ -18,8 +18,6 @@ use scaramangagency\translated\services\fields\SupertableField;
 use Craft;
 use craft\base\Component;
 
-use putyourlightson\logtofile\LogToFile;
-
 /**
  * @author    Scaramanga Agency
  * @package   Translated

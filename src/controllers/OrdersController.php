@@ -21,8 +21,6 @@ use craft\elements\Entry;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
 
-use putyourlightson\logtofile\LogToFile;
-
 /**
  * @author    Scaramanga Agency
  * @package   Translated
@@ -62,7 +60,7 @@ class OrdersController extends Controller
         ]);
     }
 
-    public function actionNewQuote($id = null, Order $errors = null)
+    public function actionNewQuote($id = null, Order $errors = null, array $form = null)
     {
         $settings = translated::$plugin->getSettings();
 
@@ -82,8 +80,23 @@ class OrdersController extends Controller
         $availableLanguages = translated::$plugin->utilityService->fetchAvailableLanguages($settings);
         $availableSubjects = translated::$plugin->utilityService->fetchAvailableSubjects($settings);
 
+        if (!$availableLanguages || !$availableSubjects) {
+            Craft::$app
+                ->getSession()
+                ->setError(Craft::t('app', 'Sorry, there appears to be an issue with the translated API'));
+            return $this->redirect(UrlHelper::cpUrl('translated/orders'));
+        }
+
         if (!$errors) {
             $errors = new Order();
+        }
+
+        if ($form) {
+            if ($form['translationAsset'] != '') {
+                $form['translationAsset'] = Asset::find()
+                    ->id($form['translationAsset'])
+                    ->one();
+            }
         }
 
         return $this->renderTemplate('translated/orders/new', [
@@ -93,6 +106,7 @@ class OrdersController extends Controller
             'selectedSource' => $availableLanguages['selectedSource'],
             'selectedTarget' => $availableLanguages['selectedTarget'],
             'data' => $data ?? null,
+            'form' => $form,
             'err' => $errors
         ]);
     }
@@ -134,6 +148,13 @@ class OrdersController extends Controller
         $availableLanguages = translated::$plugin->utilityService->fetchAvailableLanguages($settings);
         $availableSubjects = translated::$plugin->utilityService->fetchAvailableSubjects($settings);
 
+        if (!$availableLanguages || !$availableSubjects) {
+            Craft::$app
+                ->getSession()
+                ->setError(Craft::t('app', 'Sorry, there appears to be an issue with the translated API'));
+            return $this->redirect(UrlHelper::cpUrl('translated/orders'));
+        }
+
         return $this->renderTemplate('translated/orders/new', [
             'availableLanguages' => $availableLanguages['optionList'],
             'availableSubjects' => $availableSubjects,
@@ -153,14 +174,15 @@ class OrdersController extends Controller
             Craft::$app->getSession()->setError(Craft::t('app', 'Could not save quote'));
 
             Craft::$app->getUrlManager()->setRouteParams([
-                'errors' => $quoteId['errors']
+                'errors' => $quoteId['errors'],
+                'form' => $data
             ]);
 
             return null;
         }
 
         if (!$quoteId['success']) {
-            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to generate quote'));
+            Craft::$app->getSession()->setError($quoteId['response']);
             return $this->redirect(UrlHelper::cpUrl('translated/orders'));
         }
 
@@ -261,7 +283,12 @@ class OrdersController extends Controller
 
         if ($order->orderStatus > 1) {
             $orderStatusFromHTS = (array) translated::$plugin->orderService->getOrderStatus($id);
-            $orderStatusFromHTS = (array) $orderStatusFromHTS[0];
+
+            if (!$orderStatusFromHTS) {
+                $orderStatusFromHTS = null;
+            } else {
+                $orderStatusFromHTS = (array) $orderStatusFromHTS[0];
+            }
         }
 
         $user = Craft::$app->getUser();
@@ -274,7 +301,7 @@ class OrdersController extends Controller
             'orderPermissions' => $orderPermissions ?? false,
             'requestQuote' => $requestQuote ?? false,
             'statusFlag' => '<span class="label order-status ' . strtolower($status) . '">' . $status . '</span>',
-            'serviceLevel' => '<span class="label order-service ' . strtolower($service) . '">' . $service . '</span>',
+            'serviceLevel' => $service,
             'orderStatusFromHTS' => $orderStatusFromHTS ?? null,
             'inSandbox' => translated::$plugin->getSettings()->translatedSandbox,
             'syncOrder' => $syncOrder ?? false
@@ -407,7 +434,6 @@ class OrdersController extends Controller
         $text = base64_decode($_POST['text']);
 
         if (!$pid || !$text) {
-            LogToFile::error('[Order][Handle Delivery] Failed to update record for PID:' . $pid, 'translated');
             return false;
         }
 

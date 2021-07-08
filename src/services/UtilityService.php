@@ -15,8 +15,6 @@ use scaramangagency\translated\Translated;
 use Craft;
 use craft\base\Component;
 
-use putyourlightson\logtofile\LogToFile;
-
 /**
  * @author    Scaramanga Agency
  * @package   Translated
@@ -45,21 +43,12 @@ class UtilityService extends Component
             $res = curl_exec($ch);
             curl_close($ch);
         } catch (Exception $e) {
-            LogToFile::error(
-                '[Utility][Languages] Failed to fetch available languages from translated API',
-                'translated'
-            );
             return false;
         }
 
         $res = json_decode($res);
 
         if ($res->code == 0) {
-            LogToFile::error(
-                '[Utility][Languages] translated API returned an error when fetching languages. Error: ' .
-                    $res->message,
-                'translated'
-            );
             return false;
         }
 
@@ -120,20 +109,12 @@ class UtilityService extends Component
             $res = curl_exec($ch);
             curl_close($ch);
         } catch (Exception $e) {
-            LogToFile::error(
-                '[Utility][Subjects] Failed to fetch available subjects from translated API',
-                'translated'
-            );
             return false;
         }
 
         $res = json_decode($res);
 
         if ($res->code == 0) {
-            LogToFile::error(
-                '[Utility][Subjects] translated API returned an error when fetching subjects. Error: ' . $res->message,
-                'translated'
-            );
             return false;
         }
 
