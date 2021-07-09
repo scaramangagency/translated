@@ -17,6 +17,7 @@ use scaramangagency\translated\records\OrderRecord as OrderRecord;
 use Craft;
 use craft\base\Component;
 use craft\elements\Asset;
+use craft\helpers\UrlHelper;
 
 /**
  * @author    Scaramanga Agency
@@ -327,6 +328,31 @@ class OrderService extends Component
 
         if ($settings['translatedCleanup'] && $order->translationAsset) {
             $deleteAsset = Craft::$app->elements->deleteElementById($order->translationAsset->id);
+        }
+
+        if ($settings['translatedNotifications']) {
+            $emails = explode(',', $settings['translatedNotificationEmail']);
+            if (count($emails) > 0) {
+                $html =
+                    '<p>Your translation request has been fulfilled.</p><p><a href="' .
+                    UrlHelper::cpUrl() .
+                    '/translated/orders/view/"' .
+                    $order->id .
+                    '">Click here to view</a></p>';
+
+                foreach ($emails as $email) {
+                    try {
+                        Craft::$app
+                            ->getMailer()
+                            ->compose()
+                            ->setTo($email)
+                            ->setSubject('Translation has been delivered')
+                            ->setHtmlBody($html)
+                            ->send();
+                    } catch (Exception $e) {
+                    }
+                }
+            }
         }
 
         return true;
