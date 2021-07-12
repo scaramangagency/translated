@@ -121,17 +121,17 @@
     font-style: italic;
 }
 
-.meta.information {
+.translated.meta.information {
     padding: 18px 24px !important;
     border: 1px solid #2a2a2a;
 }
-.meta .primary {
+.translated.meta .primary {
     font-size: 18px !important;
 }
-.data .value {
+.translated .data .value {
     text-align: right;
     width: calc(100% - 122px) !important;
 }
-.data .heading {
+.translated .data .heading {
     flex: 0 0 115px !important;
 }

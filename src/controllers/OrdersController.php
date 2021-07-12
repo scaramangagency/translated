@@ -111,7 +111,7 @@ class OrdersController extends Controller
         ]);
     }
 
-    public function actionAutogenerate($id, $siteId)
+    public function actionAutogenerate($id, $siteId, Order $errors = null, array $form = null)
     {
         $settings = translated::$plugin->getSettings();
 
@@ -155,13 +155,27 @@ class OrdersController extends Controller
             return $this->redirect(UrlHelper::cpUrl('translated/orders'));
         }
 
+        if (!$errors) {
+            $errors = new Order();
+        }
+
+        if ($form) {
+            if ($form['translationAsset'] != '') {
+                $form['translationAsset'] = Asset::find()
+                    ->id($form['translationAsset'])
+                    ->one();
+            }
+        }
+
         return $this->renderTemplate('translated/orders/new', [
             'availableLanguages' => $availableLanguages['optionList'],
             'availableSubjects' => $availableSubjects,
             'elementType' => Asset::class,
             'selectedSource' => $availableLanguages['selectedSource'],
             'selectedTarget' => $availableLanguages['selectedTarget'],
-            'data' => $data ?? null
+            'data' => $data ?? null,
+            'form' => $form,
+            'err' => $errors
         ]);
     }
 
