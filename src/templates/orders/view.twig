@@ -23,30 +23,32 @@
 {% endblock %}
 
 {% block tabs %}
-    <nav id="tabs">
-        <ul>
-            {% if order.orderStatus == 2 or order.orderStatus == 3 %}
-                <li data-id="0">
-                    <a id="tab-0" class="tab sel" href="#tab-fulfilled" title="Fulfilled" aria-label="Fulfilled">
-                        Delivery
+    <header id="content-header" class="pane-header">
+        <nav id="tabs" class="pane-tabs">
+            <ul>
+                {% if order.orderStatus == 2 or order.orderStatus == 3 %}
+                    <li data-id="0">
+                        <a id="tab-0" class="tab sel" href="#tab-fulfilled" title="Fulfilled" aria-label="Fulfilled">
+                            Delivery
+                        </a>
+                    </li>
+                {% endif %}
+                <li data-id="1">
+                    <a id="tab-1"
+                        class="tab {{ order.orderStatus != 2 and order.orderStatus != 3 ? 'sel' : '' }}"
+                        href="#tab-information"
+                        title="Information"
+                        aria-label="Information">
+                        Order Information
                     </a>
                 </li>
-            {% endif %}
-            <li data-id="1">
-                <a id="tab-1"
-                    class="tab {{ order.orderStatus != 2 and order.orderStatus != 3 ? 'sel' : '' }}"
-                    href="#tab-information"
-                    title="Information"
-                    aria-label="Information">
-                    Order Information
-                </a>
-            </li>
-        </ul>
-        <button type="button" id="overflow-tab-btn" data-icon="ellipsis" class="btn menubtn hidden"></button>
-        <div id="overflow-tab-menu" class="menu">
-            <ul role="listbox"></ul>
-        </div>
-    </nav>
+            </ul>
+            <button type="button" id="overflow-tab-btn" data-icon="ellipsis" class="btn menubtn hidden"></button>
+            <div id="overflow-tab-menu" class="menu">
+                <ul role="listbox"></ul>
+            </div>
+        </nav>
+    </header>
 {% endblock %}
 
 {% set content %}
@@ -131,7 +133,7 @@
 
         {% if order.translationNotes != '' %}
             <div class="full">
-                <span class="knock">Notes</span><br />
+                <strong class="knock">Notes</strong><br />
                 {{ order.translationNotes }}
             </div>
         {% endif %}
