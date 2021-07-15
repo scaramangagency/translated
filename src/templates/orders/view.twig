@@ -74,7 +74,7 @@
                     Translated Content
                 </p>
                 {% if order.translationAsset %}
-                    <a href="{{ cpUrl('translated/orders/delivery/' ~ order.id) }}" class="btn">Download Content</a>
+                    <a href="{{ cpUrl('translated/orders/delivery/' ~ order.id) }}" class="btn">Download content</a>
                 {% endif %}
                 {% if order.auto == 1 and syncOrder %}
                     <a href="{{ cpUrl('translated/orders/sync/' ~ order.id) }}" class="btn submit">Sync to entry</a>
