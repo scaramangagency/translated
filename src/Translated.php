@@ -214,9 +214,13 @@ class Translated extends Plugin
             $entry = $context['entry'];
             $generateUrl = UrlHelper::cpUrl('translated/orders/autogenerate/' . $entry->siteId . '/' . $entry->id);
 
-            return '<div id="translate-field" class="field"> <a href="' .
-                $generateUrl .
-                '" class="btn submit translate"><div class="t9n-indicator" data-icon="language"></div> Translate entry</a></div>';
+            $hasSites = Craft::$app->elements->getEnabledSiteIdsForElement($entry->id);
+
+            if (count($hasSites) > 1) {
+                return '<div id="translate-field" class="field"> <a href="' .
+                    $generateUrl .
+                    '" class="btn submit translate"><div class="t9n-indicator" data-icon="language"></div> Translate entry</a></div>';
+            }
         });
     }
 }
