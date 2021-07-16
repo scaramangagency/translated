@@ -30,7 +30,7 @@
                 {{
                     forms.textField({
                         label: 'Project Name',
-                        instructions: 'Add a title to this translation quote',
+                        instructions: 'This will be automatically generated from the entry title, but you can modify it or create your own.',
                         id: 'title',
                         name: 'title',
                         required: 'required',
@@ -72,7 +72,7 @@
                     {{
                         forms.selectField({
                             label: 'Source Language',
-                            instructions: 'What language is your content currently written in?',
+                            instructions: 'Please identify the language of the text to be translated.',
                             id: 'sourceLanguage',
                             name: 'sourceLanguage',
                             required: 'required',
@@ -87,7 +87,7 @@
                     {{
                         forms.selectField({
                             label: 'Target Language',
-                            instructions: 'What language do you want to translate into?',
+                            instructions: 'Please identify the language that you want to be supplied.',
                             id: 'targetLanguage',
                             name: 'targetLanguage',
                             required: 'required',
@@ -103,8 +103,8 @@
                 <div class="half">
                     {{
                         forms.selectField({
-                            label: 'Subject',
-                            instructions: 'What industry does your content relate to?',
+                            label: 'Genre',
+                            instructions: 'Select a category that best describes the subject matter of your text to help allocate this to the most appropriate translator.',
                             id: 'translationSubject',
                             name: 'translationSubject',
                             options: availableSubjects,
@@ -116,8 +116,8 @@
                 <div class="half">
                     {{
                         forms.textField({
-                            label: 'Word count',
-                            instructions: 'Provide manually if uploading an asset, otherwise automatically calculated',
+                            label: 'Word Count',
+                            instructions: 'This will be automatically generated from the submitted entry, however, if you are uploading your own document then you will need to provide this information.',
                             id: 'wordCount',
                             name: 'wordCount',
                             required: 'required',
@@ -132,7 +132,7 @@
                 {{
                     forms.textareaField({
                         label: 'Notes',
-                        instructions: 'Provide notes or instructions to the translator',
+                        instructions: 'Provide additional notes to the translator',
                         id: 'translationNotes',
                         name: 'translationNotes',
                         value: form['translationNotes'] ?? data['translationNotes'] ?? ''
@@ -150,6 +150,7 @@
                     {{
                         forms.textareaField({
                             label: 'Content',
+                            instructions: 'You can either add your text directly to this text field or upload a document',
                             id: 'translationContent',
                             name: 'translationContent',
                             required: 'required',
@@ -172,6 +173,7 @@
                 {{
                     forms.elementSelectField({
                         label: 'Select file to translate',
+                        instructions: 'Accepted formats include: CSV, Word and Text. Your translation will be returned in the same format.',
                         id: 'translationAsset',
                         name: 'translationAsset',
                         viewMode: 'large',

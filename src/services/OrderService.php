@@ -327,10 +327,6 @@ class OrderService extends Component
 
         $settings = translated::$plugin->getSettings();
 
-        if ($settings['translatedCleanup'] && $order->translationAsset) {
-            $deleteAsset = Craft::$app->elements->deleteElementById($order->translationAsset->id);
-        }
-
         if ($settings['translatedNotifications']) {
             $emails = explode(',', $settings['translatedNotificationEmail']);
             if (count($emails) > 0) {

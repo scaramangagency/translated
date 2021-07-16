@@ -79,6 +79,9 @@
 .mb-8 {
     margin-bottom: 8px;
 }
+.capitalise {
+    text-transform: capitalize;
+}
 
 .full {
     width: 100%;

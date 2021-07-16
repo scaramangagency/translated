@@ -304,7 +304,6 @@ class Order extends Element
             'estimatedDeliveryDate' => ['label' => 'Delivery date'],
             'ownedBy' => ['label' => 'Requested by'],
             'reviewedBy' => ['label' => 'Reviewed by'],
-            'rejectedBy' => ['label' => 'Rejected by'],
             'dateApproved' => ['label' => 'Approved on'],
             'dateRejected' => ['label' => 'Rejected on'],
             'dateFulfilled' => ['label' => 'Fulfilled on']

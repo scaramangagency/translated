@@ -27,7 +27,6 @@ class Settings extends Model
 
     public $translatedUsername;
     public $translatedPassword;
-    public $translatedCleanup;
     public $translatedSandbox;
     public $translatedNotifications;
     public $translatedNotificationEmail;
@@ -40,7 +39,6 @@ class Settings extends Model
     {
         return [
             [['translatedUsername', 'translatedPassword'], 'required'],
-            ['translatedCleanup', 'boolean'],
             ['translatedSandbox', 'boolean'],
             ['translatedNotifications', 'boolean'],
             ['translatedNotificationEmail', 'string'],

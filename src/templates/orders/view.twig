@@ -68,18 +68,18 @@
             {% endif %}
 
             {% if order.orderStatus == 3 %}
-                <p class="success">
+                <p>
                     <span data-icon="info"></span> Your order has been completed.
                 </p>
                 <hr />
-                <p class="knock">
-                    Translated Content
+                <p>
+                    <strong class="knock">Translated Content</strong>
                 </p>
                 {% if order.translationAsset %}
-                    <a href="{{ cpUrl('translated/orders/delivery/' ~ order.id) }}" class="btn">Download content</a>
+                    <a href="{{ cpUrl('translated/orders/delivery/' ~ order.id) }}" class="btn">Download Content</a>
                 {% endif %}
                 {% if order.auto == 1 and syncOrder %}
-                    <a href="{{ cpUrl('translated/orders/sync/' ~ order.id) }}" class="btn submit">Sync to entry</a>
+                    <a href="{{ cpUrl('translated/orders/sync/' ~ order.id) }}" class="btn submit">Sync to Entry</a>
                 {% else %}
                     {{ order.translatedContent|nl2br }}
                 {% endif %}
@@ -87,11 +87,11 @@
 
             {% if orderStatusFromHTS %}
                 <hr />
-                <p class="knock">
-                    Project Manager
+                <p>
+                    <strong class="knock">Project Manager</strong>
                 </p>
                 <p>
-                    <strong>{{ orderStatusFromHTS.pm_name }}</strong><br />
+                    {{ orderStatusFromHTS.pm_name }}<br />
                     <a href="mailto:{{ orderStatusFromHTS.pm_email }}">{{ orderStatusFromHTS.pm_email }}</a>
                 </p>
             {% endif %}
@@ -122,8 +122,8 @@
 
         <div class="row">
             <div class="half">
-                <strong class="knock">Subject</strong><br />
-                {{ order.translationSubject }}
+                <strong class="knock">Genre</strong><br />
+                <span class="capitalise">{{ order.translationSubject }}</span>
             </div>
             <div class="half">
                 <strong class="knock">Word Count</strong><br />
@@ -141,7 +141,7 @@
         {% if order.translationAsset != '' %}
             {% set uploadedAsset = craft.assets.id(order.translationAsset).one() %}
             <div class="full">
-                <strong class="knock">Asset</strong><br />
+                <strong class="knock">File</strong><br />
                 <a href="{{ uploadedAsset.cpEditUrl }}">{{ uploadedAsset.title }}</a>
             </div>
         {% else %}
