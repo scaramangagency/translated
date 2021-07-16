@@ -63,6 +63,7 @@ class OrderService extends Component
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
             $res = curl_exec($ch);
+
             curl_close($ch);
         } catch (Exception $e) {
             return false;
@@ -70,7 +71,7 @@ class OrderService extends Component
 
         $res = json_decode($res);
 
-        if ($res->code == 0) {
+        if ($res->code == '0') {
             return false;
         }
 

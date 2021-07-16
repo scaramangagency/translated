@@ -85,7 +85,7 @@
                 {% endif %}
             {% endif %}
 
-            {% if orderStatusFromHTS[0] %}
+            {% if orderStatusFromHTS %}
                 <hr />
                 <p class="knock">
                     Project Manager
@@ -184,7 +184,7 @@
 
         {% if order.orderStatus != 3 %}
             <div class="data">
-                {% if order.orderStatus == 2 and orderStatusFromHTS[0] %}
+                {% if order.orderStatus == 2 and orderStatusFromHTS %}
                     <h4 class="heading">
                         Delivery Date
                     </h4>

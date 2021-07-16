@@ -296,12 +296,13 @@ class OrdersController extends Controller
         }
 
         if ($order->orderStatus > 1) {
-            $orderStatusFromHTS = (array) translated::$plugin->orderService->getOrderStatus($id);
+            $getOrderStatus = translated::$plugin->orderService->getOrderStatus($id);
 
-            if (!$orderStatusFromHTS) {
+            if (!$getOrderStatus) {
                 $orderStatusFromHTS = null;
             } else {
-                $orderStatusFromHTS = (array) $orderStatusFromHTS[0];
+                $massage = (array) $getOrderStatus;
+                $orderStatusFromHTS = $massage[0];
             }
         }
 
