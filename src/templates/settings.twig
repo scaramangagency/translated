@@ -6,22 +6,30 @@
 {% set title = 'Translated' %}
 
 {% block tabs %}
-    <nav id="tabs">
-        <ul>
-            <li data-id="0">
-                <a id="tab-0" class="tab sel" href="#tab-settings" title="Settings" aria-label="Settings">Settings</a>
-            </li>
-            <li data-id="1">
-                <a id="tab-1" class="tab" href="#tab-notifications" title="Notifications" aria-label="Notifications">
-                    Notifications
-                </a>
-            </li>
-        </ul>
-        <button type="button" id="overflow-tab-btn" data-icon="ellipsis" class="btn menubtn hidden"></button>
-        <div id="overflow-tab-menu" class="menu">
-            <ul role="listbox"></ul>
-        </div>
-    </nav>
+    <header id="content-header" class="pane-header">
+        <nav id="tabs" class="pane-tabs">
+            <ul>
+                <li data-id="0">
+                    <a id="tab-0" class="tab sel" href="#tab-settings" title="Settings" aria-label="Settings">
+                        Settings
+                    </a>
+                </li>
+                <li data-id="1">
+                    <a id="tab-1"
+                        class="tab"
+                        href="#tab-notifications"
+                        title="Notifications"
+                        aria-label="Notifications">
+                        Notifications
+                    </a>
+                </li>
+            </ul>
+            <button type="button" id="overflow-tab-btn" data-icon="ellipsis" class="btn menubtn hidden"></button>
+            <div id="overflow-tab-menu" class="menu">
+                <ul role="listbox"></ul>
+            </div>
+        </nav>
+    </header>
 {% endblock %}
 
 {% set content %}

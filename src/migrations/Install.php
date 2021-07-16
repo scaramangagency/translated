@@ -66,7 +66,7 @@ class Install extends Migration
                 'quoteTotal' => $this->float(),
                 'quotePID' => $this->integer(),
 
-                'translatedContent' => $this->blob(),
+                'translatedContent' => $this->text(),
 
                 'uid' => $this->uid()
             ]);
