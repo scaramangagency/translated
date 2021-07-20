@@ -141,7 +141,8 @@ class OrdersController extends Controller
 
         $data['projectName'] = $element->title;
         $data['wordCount'] = translated::$plugin->dataService->getWordCount($element);
-        $data['translationNotes'] = "Please translate text from RAW column into TRANSLATED column ONLY. \r\n";
+        $data['translationNotes'] =
+            "Please translate text from RAW column into TRANSLATED column. If possible, please try to retain any HTML markup for paragraphs or headings. \r\n";
         $data['entryId'] = $element->id;
         $data['auto'] = 1;
 
