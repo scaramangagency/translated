@@ -28,6 +28,7 @@ class Settings extends Model
     public $translatedUsername;
     public $translatedPassword;
     public $translatedSandbox;
+    public $translateSlugs;
     public $translatedNotifications;
     public $translatedNotificationEmail;
     public $translatedAutogenerationDirectory;
@@ -40,6 +41,7 @@ class Settings extends Model
         return [
             [['translatedUsername', 'translatedPassword'], 'required'],
             ['translatedSandbox', 'boolean'],
+            ['translateSlugs', 'boolean'],
             ['translatedNotifications', 'boolean'],
             ['translatedNotificationEmail', 'string'],
             ['translatedAutogenerationDirectory', 'integer']

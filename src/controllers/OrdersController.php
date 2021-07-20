@@ -408,6 +408,7 @@ class OrdersController extends Controller
 
     public function actionSyncOrder()
     {
+        $settings = translated::$plugin->getSettings();
         $data = Craft::$app->getRequest()->getBodyParam('order', []);
         $syncData = translated::$plugin->dataService->updateEntryFromTranslationCSV($data);
 
@@ -422,11 +423,12 @@ class OrdersController extends Controller
             ->one();
 
         if (isset($syncData['title'])) {
-            $element->title = $syncData['title'];
+            $element->title = $syncData['title'] != '' ? $syncData['title'] : $element->title;
             unset($syncData['title']);
         }
-        if (isset($syncData['slug'])) {
-            $element->slug = $syncData['slug'];
+
+        if (isset($syncData['slug']) && $settings['translateSlugs']) {
+            $element->slug = $syncData['slug'] != '' ? $syncData['slug'] : $element->slug;
             unset($syncData['slug']);
         }
 
