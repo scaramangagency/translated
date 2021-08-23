@@ -142,6 +142,7 @@ class OrdersController extends Controller
 
         if ($csv['uploaded']) {
             $data['translationAsset'] = $csv['path'];
+            $attachedAsset = $csv['path'];
         } else {
             $data['failedUpload'] = basename($csv['path']);
         }
@@ -183,7 +184,8 @@ class OrdersController extends Controller
             'selectedTarget' => $availableLanguages['selectedTarget'],
             'data' => $data ?? null,
             'form' => $form,
-            'err' => $errors
+            'err' => $errors,
+            'attachedAsset' => $attachedAsset
         ]);
     }
 

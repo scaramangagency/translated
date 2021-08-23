@@ -4,6 +4,18 @@
 {% set title = order.title %}
 {% set selectedSubnavItem = 'orders' %}
 {% do view.registerAssetBundle('scaramangagency\\translated\\web\\TranslatedAsset') %}
+
+{% set crumbs = [
+    {
+        label: 'Translated',
+        url: url('translated')
+    },
+    {
+        label: 'Orders',
+        url: url('translated/orders')
+    }
+] %}
+
 {% block actionButton %}
     <div class="buttons">
         <a href="{{ cpUrl('translated/orders/duplicate/' ~ order.id) }}" class="btn tertiary">Duplicate Quote</a>

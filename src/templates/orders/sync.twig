@@ -5,6 +5,21 @@
 {% set title = 'Sync translated content to ' ~ entry.title %}
 {% set selectedSubnavItem = 'orders' %}
 
+{% set crumbs = [
+    {
+        label: 'Translated',
+        url: url('translated')
+    },
+    {
+        label: 'Orders',
+        url: url('translated/orders')
+    },
+    {
+        label: 'Order ' ~ data['entryId'],
+        url: url('translated/orders/' ~ data['entryId'])
+    }
+] %}
+
 {% set content %}
     <p>
         <strong class="knock">Original Entry</strong><br /> <a href="{{ entry.cpEditUrl }}">{{ entry.title }}</a>

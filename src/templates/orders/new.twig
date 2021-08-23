@@ -5,6 +5,17 @@
 {% set title = 'Generate a new quote' %}
 {% set selectedSubnavItem = 'orders' %}
 
+{% set crumbs = [
+    {
+        label: 'Translated',
+        url: url('translated')
+    },
+    {
+        label: 'Orders',
+        url: url('translated/orders')
+    }
+] %}
+
 {% set content %}
     {% if not availableLanguages or not availableSubjects %}
         Failed to get a response from the translated API. Try again later.
