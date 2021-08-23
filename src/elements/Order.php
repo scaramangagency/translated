@@ -126,13 +126,13 @@ class Order extends Element
             'orderStatus:2' => [
                 'defaultSort' => ['translated_orders.dateCreated', 'desc'],
                 'key' => 'orderStatus:2',
-                'label' => 'In Process',
+                'label' => 'Processing',
                 'criteria' => ['orderStatus' => self::STATUS_PROCESSING]
             ],
             'orderStatus:3' => [
                 'defaultSort' => ['translated_orders.dateCreated', 'desc'],
                 'key' => 'orderStatus:3',
-                'label' => 'Completed',
+                'label' => 'Delivered',
                 'criteria' => ['orderStatus' => [self::STATUS_DELIVERED, self::STATUS_FAILED]]
             ],
             'orderStatus:4' => [

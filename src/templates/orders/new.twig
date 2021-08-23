@@ -45,7 +45,7 @@
                         id: 'title',
                         name: 'title',
                         required: 'required',
-                        value: form['title'] ?? data['projectName'] ?? '',
+                        value: duplicateTitle ?? form['title'] ?? data['projectName'] ?? '',
                         errors: err.getErrors('title')
                     })
                 }}

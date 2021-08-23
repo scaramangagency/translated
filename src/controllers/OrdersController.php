@@ -81,6 +81,8 @@ class OrdersController extends Controller
                     ->id($data['translationAsset'])
                     ->one();
             }
+
+            $duplicateTitle = $data['title'] . ' copy';
         }
 
         $availableLanguages = translated::$plugin->utilityService->fetchAvailableLanguages($settings);
@@ -114,7 +116,8 @@ class OrdersController extends Controller
             'data' => $data ?? null,
             'form' => $form,
             'err' => $errors,
-            'attachedAsset' => $attachedAsset ?? null
+            'attachedAsset' => $attachedAsset ?? null,
+            'duplicateTitle' => $duplicateTitle ?? null
         ]);
     }
 
