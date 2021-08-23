@@ -454,7 +454,7 @@ class OrdersController extends Controller
             return $this->redirect(Craft::$app->getRequest()->referrer);
         } else {
             Craft::$app->getSession()->setNotice(Craft::t('app', 'Translated data synced to entry'));
-            return $this->redirect(UrlHelper::cpUrl('translated/orders/view/' . $data['id']));
+            return $this->redirect(UrlHelper::cpUrl('translated/orders/sync/' . $data['id']));
         }
     }
 
