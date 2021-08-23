@@ -96,17 +96,6 @@
                     {{ order.translatedContent|nl2br }}
                 {% endif %}
             {% endif %}
-
-            {% if orderStatusFromHTS %}
-                <hr />
-                <p>
-                    <strong class="knock">Project Manager</strong>
-                </p>
-                <p>
-                    {{ orderStatusFromHTS.pm_name }}<br />
-                    <a href="mailto:{{ orderStatusFromHTS.pm_email }}">{{ orderStatusFromHTS.pm_email }}</a>
-                </p>
-            {% endif %}
         </div>
     {% endif %}
     <div id="tab-information" class="{{ order.orderStatus == 2 or order.orderStatus == 3 ? 'hidden' : '' }}">
