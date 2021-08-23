@@ -75,6 +75,12 @@ class OrdersController extends Controller
                 Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get quote to duplicate'));
                 return $this->redirect(UrlHelper::cpUrl('translated/orders'));
             }
+
+            if ($data['translationAsset'] != '') {
+                $attachedAsset = Asset::find()
+                    ->id($data['translationAsset'])
+                    ->one();
+            }
         }
 
         $availableLanguages = translated::$plugin->utilityService->fetchAvailableLanguages($settings);
@@ -93,7 +99,7 @@ class OrdersController extends Controller
 
         if ($form) {
             if ($form['translationAsset'] != '') {
-                $form['translationAsset'] = Asset::find()
+                $attachedAsset = Asset::find()
                     ->id($form['translationAsset'])
                     ->one();
             }
@@ -107,7 +113,8 @@ class OrdersController extends Controller
             'selectedTarget' => $availableLanguages['selectedTarget'],
             'data' => $data ?? null,
             'form' => $form,
-            'err' => $errors
+            'err' => $errors,
+            'attachedAsset' => $attachedAsset ?? null
         ]);
     }
 

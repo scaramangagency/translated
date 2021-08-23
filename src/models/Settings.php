@@ -27,9 +27,9 @@ class Settings extends Model
 
     public $translatedUsername;
     public $translatedPassword;
-    public $translatedSandbox;
-    public $translateSlugs;
-    public $translatedNotifications;
+    public $translatedSandbox = false;
+    public $translateSlugs = true;
+    public $translatedNotifications = false;
     public $translatedNotificationEmail;
     public $translatedAutogenerationDirectory;
 

@@ -166,10 +166,6 @@
             {% endif %}
 
             <div class="full">
-                {% set translationAsset = form['translationAsset'] is defined
-                    ? [form['translationAsset']]
-                    : data['translationAsset'] is defined ? [data['translationAsset']] : null
-                %}
                 {{
                     forms.elementSelectField({
                         label: 'Select file to translate',
@@ -182,7 +178,7 @@
                         sources: [],
                         limit: 1,
                         required: 'required',
-                        elements: translationAsset,
+                        elements: [attachedAsset] ?? null,
                         errors: err.getErrors('translationAsset') ?? null
                     })
                 }}

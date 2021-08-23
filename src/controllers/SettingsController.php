@@ -29,7 +29,8 @@ class SettingsController extends Controller
 
         return $this->renderTemplate('translated/settings', [
             'settings' => $settings,
-            'assetOptions' => $decorateVolumes
+            'assetOptions' => $decorateVolumes,
+            'config' => Craft::$app->getConfig()->getConfigFromFile('translated')
         ]);
     }
 

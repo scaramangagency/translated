@@ -223,7 +223,8 @@ class Order extends Element
             case 1:
                 $dd = $this->dateCreated->modify('+1 day');
                 $now = new \DateTime();
-                if ($dd->format('c') < $now->format('c')) {
+
+                if ($now->format('c') < $dd->format('c')) {
                     $status = 'Pending';
                 } else {
                     $status = 'Expired';
