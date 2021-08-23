@@ -219,7 +219,7 @@ class Translated extends Plugin
             if (count($hasSites) > 1) {
                 return '<div id="translate-field" class="field"> <a href="' .
                     $generateUrl .
-                    '" class="btn submit translate"><div class="t9n-indicator" data-icon="language"></div> Translate entry</a></div>';
+                    '" class="btn submit translate"><div class="t9n-indicator" data-icon="language"></div> Translate</a></div>';
             }
         });
     }
