@@ -38,6 +38,6 @@ return [
     // Should Translated send delivery notifications
     'translatedNotifications' => false,
 
-    // Which emails should Translated send delivery notifications to?
+    // Which emails should Translated send delivery notifications to? Add as comma seperated values
     'translatedNotificationEmail' => ''
 ];

@@ -296,7 +296,6 @@ class OrderService extends Component
 
     public function acceptDelivery($pid, $text)
     {
-        // TODO: Add email notification that translation has been received
         $order = new OrderRecord();
         $order = OrderRecord::findOne(['quotePID' => $pid]);
 
