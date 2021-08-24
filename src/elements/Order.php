@@ -164,7 +164,7 @@ class Order extends Element
 
         $actions[] = $elementsService->createAction([
             'type' => DeleteAction::class,
-            'confirmationMessage' => 'Are you sure you want to delete the selected orders?',
+            'confirmationMessage' => 'Are you sure you want to permanently delete the selected orders?',
             'successMessage' => 'Orders deleted.'
         ]);
 

@@ -290,7 +290,7 @@ class OrderService extends Component
         }
 
         foreach ($orders as $order) {
-            Craft::$app->elements->deleteElementById($order->id, null, null, false);
+            Craft::$app->elements->deleteElementById($order->id, null, null, true);
         }
 
         return true;
