@@ -62,7 +62,7 @@ class Install extends Migration
                 'auto' => $this->integer(),
                 'entryId' => $this->integer(),
 
-                'quoteDeliveryDate' => $this->dateTime(),
+                'quoteDeliveryDate' => $this->dateTime()->null(),
                 'quoteTotal' => $this->float(),
                 'quotePID' => $this->integer(),
 
