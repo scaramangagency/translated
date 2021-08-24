@@ -209,7 +209,7 @@ class Order extends Element
             return \Craft::$app->getFormatter()->asDatetime($this->quoteDeliveryDate, 'short');
         }
 
-        return null;
+        return '';
     }
 
     public function getOwner()
@@ -221,7 +221,8 @@ class Order extends Element
     {
         switch ($this->orderStatus) {
             case 1:
-                $dd = $this->dateCreated->modify('+1 day');
+                $t = clone $this->dateCreated;
+                $dd = $t->modify('+1 day');
                 $now = new \DateTime();
 
                 if ($now->format('c') < $dd->format('c')) {
@@ -360,13 +361,13 @@ class Order extends Element
             case 'title':
                 return $this->title;
             case 'ownedBy':
-                return $this->getOwner() ?: '';
+                return $this->getOwner() ?: '-';
             case 'reviewedBy':
-                return $this->getReviewer() ?: '';
+                return $this->getReviewer() ?: '-';
             case 'orderStatus':
                 return $this->getStatus();
             case 'estimatedDeliveryDate':
-                return $this->getEstimatedDeliveryDate() ?? null;
+                return $this->getEstimatedDeliveryDate() ?: '-';
             case 'quoteTotal':
                 return \Craft::$app->getFormatter()->asCurrency($this->$attribute, 'EUR');
             case 'dateApproved':
