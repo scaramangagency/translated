@@ -17,7 +17,9 @@ use scaramangagency\translated\records\OrderRecord as OrderRecord;
 use Craft;
 use craft\base\Component;
 use craft\elements\Asset;
+use craft\helpers\Template;
 use craft\helpers\UrlHelper;
+use craft\mail\Message;
 
 /**
  * @author    Scaramanga Agency
@@ -328,22 +330,68 @@ class OrderService extends Component
 
         if ($settings['translatedNotifications']) {
             $emails = explode(',', $settings['translatedNotificationEmail']);
-            if (count($emails) > 0) {
-                $html =
-                    '<p>Your translation request has been fulfilled.</p><p><a href="' .
-                    UrlHelper::cpUrl() .
-                    '/translated/orders/view/"' .
-                    $order->id .
-                    '">Click here to view</a></p>';
 
+            // https://craftcms.stackexchange.com/a/27728
+            $message = new Message();
+            $systemMessage = Craft::$app->getSystemMessages()->getMessage('test_email', $message->language);
+
+            $view = Craft::$app->getView();
+            $templateMode = $view->getTemplateMode();
+            $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
+
+            $language = Craft::$app->language;
+            if ($message->language !== null) {
+                Craft::$app->language = $message->language;
+            }
+
+            $settings = Craft::$app->getSystemSettings()->getEmailSettings();
+            $variables = ($message->variables ?: []) + [
+                'emailKey' => $message->key,
+                'fromEmail' => $settings->fromEmail,
+                'fromName' => $settings->fromName
+            ];
+
+            if (Craft::$app->getEdition() === Craft::Pro && Craft::$app->getMailer()->template) {
+                $template = Craft::$app->getMailer()->template;
+            } else {
+                $view->setTemplateMode($view::TEMPLATE_MODE_CP);
+                $template = '_special/email';
+            }
+
+            $e = null;
+
+            $htmlBody =
+                '<p>Good news. Your translation has been completed and is ready for you to review.</p>' .
+                '<p><a style="padding: 8px 12px; display: inline-block; border-radius: 6px; background-color: #E12D39; color: white; font-weight: 500" href="' .
+                UrlHelper::cpUrl() .
+                '/translated/orders/view/' .
+                $order->id .
+                '">View your translated file</a></p>';
+
+            try {
+                $htmlBody = $view->renderTemplate(
+                    $template,
+                    array_merge($variables, [
+                        'body' => Template::raw($htmlBody)
+                    ])
+                );
+            } catch (TemplateLoaderException $e) {
+            }
+
+            Craft::$app->language = $language;
+            $view->setTemplateMode($templateMode);
+
+            if ($e !== null) {
+                throw $e;
+            }
+
+            if (count($emails) > 0) {
                 foreach ($emails as $email) {
                     try {
-                        Craft::$app
-                            ->getMailer()
-                            ->compose()
-                            ->setTo($email)
+                        $message
                             ->setSubject('Translation has been delivered')
-                            ->setHtmlBody($html)
+                            ->setHtmlBody($htmlBody)
+                            ->setTo($email)
                             ->send();
                     } catch (Exception $e) {
                     }
