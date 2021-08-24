@@ -125,19 +125,19 @@ class DataService extends Component
         foreach ($element->getFieldLayout()->getFields() as $layoutField) {
             $field = Craft::$app->fields->getFieldById($layoutField->id);
 
+            if ($field instanceof \craft\fields\Matrix) {
+                $wordCount += MatrixField::getMatrixDataWordCount($element, $field);
+            }
+
+            if ($field instanceof \verbb\supertable\fields\SuperTableField) {
+                $wordCount += SupertableField::getSupertableDataWordCount($element, $field);
+            }
+
+            if ($field instanceof \benf\neo\Field) {
+                $wordCount += NeoField::getNeoDataWordCount($element, $layoutField);
+            }
+
             if ($field->getIsTranslatable()) {
-                if ($field instanceof \craft\fields\Matrix) {
-                    $wordCount += MatrixField::getMatrixDataWordCount($element, $field);
-                }
-
-                if ($field instanceof \verbb\supertable\fields\SuperTableField) {
-                    $wordCount += SupertableField::getSupertableDataWordCount($element, $field);
-                }
-
-                if ($field instanceof \benf\neo\Field) {
-                    $wordCount += NeoField::getNeoDataWordCount($element, $layoutField);
-                }
-
                 if ($field instanceof \craft\fields\PlainText || $field instanceof \craft\redactor\Field) {
                     $wordCount += StandardField::getStandardDataWordCount($element, $field);
                 }
@@ -154,19 +154,19 @@ class DataService extends Component
         foreach ($element->getFieldLayout()->getFields() as $layoutField) {
             $field = Craft::$app->fields->getFieldById($layoutField->id);
 
+            if ($field instanceof \craft\fields\Matrix) {
+                $data = array_merge($data, MatrixField::decorateMatixData($element, $layoutField));
+            }
+
+            if ($field instanceof \verbb\supertable\fields\SuperTableField) {
+                $data = array_merge($data, SupertableField::decorateSupertableData($element, $layoutField));
+            }
+
+            if ($field instanceof \benf\neo\Field) {
+                $data = array_merge($data, NeoField::decorateNeoData($element, $layoutField));
+            }
+
             if ($field->getIsTranslatable()) {
-                if ($field instanceof \craft\fields\Matrix) {
-                    $data = array_merge($data, MatrixField::decorateMatixData($element, $layoutField));
-                }
-
-                if ($field instanceof \verbb\supertable\fields\SuperTableField) {
-                    $data = array_merge($data, SupertableField::decorateSupertableData($element, $layoutField));
-                }
-
-                if ($field instanceof \benf\neo\Field) {
-                    $data = array_merge($data, NeoField::decorateNeoData($element, $layoutField));
-                }
-
                 if ($field instanceof \craft\fields\PlainText || $field instanceof \craft\redactor\Field) {
                     $tmp = StandardField::decorateStandardData($element, $layoutField);
 
