@@ -129,7 +129,7 @@ class OrdersController extends Controller
             return $this->redirect(UrlHelper::cpUrl('translated/settings'));
         }
 
-        $element = Craft::$app->getElements()->getElementById($id, null, $siteId);
+        $element = Craft::$app->getEntries()->getEntryById($id, $siteId);
 
         if (!$element) {
             Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get get content from this entry'));
