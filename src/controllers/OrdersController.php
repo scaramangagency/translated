@@ -376,12 +376,11 @@ class OrdersController extends Controller
         $asset = Asset::find()
             ->id($data['translationAsset'])
             ->one();
-
         $type = $asset->getMimeType();
         $ext = $asset->extension;
 
         header('Content-Description: File Transfer');
-        header('Content-Type:' . $type);
+        header('Content-Type:' . $type . ';charset=utf-8');
         header(
             'Content-Disposition: attachment; filename=delivery_file_' .
                 $orderId .
@@ -393,7 +392,11 @@ class OrdersController extends Controller
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
-        ob_clean();
+
+        if (ob_get_contents() || ob_get_length()) {
+            ob_end_clean();
+        }
+
         flush();
 
         echo $deliveryBlob;
@@ -461,7 +464,7 @@ class OrdersController extends Controller
     public function actionWebhook()
     {
         $pid = $_POST['pid'];
-        $text = base64_decode($_POST['text']);
+        $text = $_POST['text'];
 
         if (!$pid || !$text) {
             return false;
