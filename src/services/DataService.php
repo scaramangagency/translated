@@ -96,13 +96,20 @@ class DataService extends Component
         fputs($fp, $deliveryBlob);
         fclose($fp);
 
-        $reader = new Xlsx();
-        $spreadsheet = @$reader->load($filepath . DIRECTORY_SEPARATOR . $filename) ?? null;
-        $writer = new WriterCsv($spreadsheet);
         try {
+            $reader = new Xlsx();
+            $spreadsheet = @$reader->load($filepath . DIRECTORY_SEPARATOR . $filename) ?? null;
+            $writer = new WriterCsv($spreadsheet);
             $writer->save($filepath . DIRECTORY_SEPARATOR . 'csv_' . $filename);
         } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
-            return false;
+            try {
+                $reader = new ReaderCsv();
+                $spreadsheet = @$reader->load($filepath . DIRECTORY_SEPARATOR . $filename) ?? null;
+                $writer = new WriterCsv($spreadsheet);
+                $writer->save($filepath . DIRECTORY_SEPARATOR . 'csv_' . $filename);
+            } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
+                return false;
+            }
         }
         $reader = new ReaderCsv();
         $lines = $reader
