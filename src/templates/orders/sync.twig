@@ -21,6 +21,17 @@
 ] %}
 
 {% set content %}
+    {% if orderInfo is defined %}
+        <div id="alerts" class="mb-8">
+            <p>
+                Failed to sync content automatically. There may be an issue with the supplied file. Contact your project
+                manager <a class="pm-error" href="mailto:{{ orderInfo[0].pm_email ?? orderInfo.pm_email }}">
+                    {{ orderInfo[0].pm_name ?? orderInfo.pm_name }}
+                </a>
+            </p>
+        </div>
+    {% endif %}
+
     <p>
         <strong class="knock">Original Entry</strong><br /> <a href="{{ entry.cpEditUrl }}">{{ entry.title }}</a>
     </p>
@@ -39,6 +50,9 @@
                 options: availableSites
             })
         }}
+        <ul class="errors hidden sync-error" js-err>
+            <li>Select which site to push the translated content to</li>
+        </ul>
 
         <input type="hidden" id="id" name="id" value="{{ data['id'] }}" />
         {% if data['entryId'] %}
@@ -46,6 +60,40 @@
         {% endif %}
         {% endnamespace %}
 
-        <input type="submit" class="submit btn" value="{{ 'Sync Content'|t }}" />
+        <input type="submit" class="submit btn" js-submit value="{{ 'Sync Content'|t }}" />
     </form>
 {% endset %}
+
+{% js %}
+    {# prettier-ignore-start #}
+    var simulateClick = function (elem) {
+        var evt = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window
+        });
+        var canceled = !elem.dispatchEvent(evt);
+    };
+
+    let submit = document.querySelector('[js-submit]');
+
+    function checkValidation(event) {
+        let stopSubmission = false;
+        event.preventDefault();
+
+        let siteIdField = document.querySelector('#order-siteId');
+
+        if (siteIdField.value == '') {
+            stopSubmission = true;
+            document.querySelector('[js-err]').classList.remove('hidden');
+        }
+
+        if (!stopSubmission) {
+            submit.removeEventListener('click', checkValidation, true);
+            simulateClick(submit);
+        }
+    };
+
+    submit.addEventListener('click', checkValidation, true);
+    {# prettier-ignore-end #}
+{% endjs %}

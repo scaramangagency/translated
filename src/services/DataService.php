@@ -16,6 +16,10 @@ use scaramangagency\translated\services\fields\NeoField;
 use scaramangagency\translated\services\fields\StandardField;
 use scaramangagency\translated\services\fields\SupertableField;
 
+use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+use PhpOffice\PhpSpreadsheet\Reader\Csv as ReaderCsv;
+use PhpOffice\PhpSpreadsheet\Writer\Csv as WriterCsv;
+
 use Craft;
 use craft\base\Component;
 
@@ -86,31 +90,46 @@ class DataService extends Component
 
         $deliveryBlob = base64_decode($order['translatedContent']);
 
-        $csvData = $deliveryBlob;
-        $lines = explode(PHP_EOL, $csvData);
-        $array = [];
+        $filepath = Craft::$app->getPath()->getTempAssetUploadsPath();
+        $filename = 'tmp_' . $data['id'] . '.csv';
+        $fp = fopen($filepath . DIRECTORY_SEPARATOR . $filename, 'w');
+        fputs($fp, $deliveryBlob);
+        fclose($fp);
 
-        $i = 0;
+        $reader = new Xlsx();
+        $spreadsheet = @$reader->load($filepath . DIRECTORY_SEPARATOR . $filename) ?? null;
+        $writer = new WriterCsv($spreadsheet);
+        try {
+            $writer->save($filepath . DIRECTORY_SEPARATOR . 'csv_' . $filename);
+        } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
+            return false;
+        }
+        $reader = new ReaderCsv();
+        $lines = $reader
+            ->load($filepath . DIRECTORY_SEPARATOR . 'csv_' . $filename)
+            ->getActiveSheet()
+            ->toArray();
 
         foreach ($lines as $line) {
-            $i++;
-            if ($i == 1) {
+            if ($line[0] == 'HANDLE') {
                 continue;
             }
 
-            $parsed = str_getcsv($line);
-            $fieldHandle = explode('.', $parsed[0]);
+            $fieldHandle = explode('.', $line[0]);
 
             if (sizeof($fieldHandle) == 1) {
-                $originalElement[$parsed[0]] = $parsed[2];
+                $originalElement[$line[0]] = $line[2];
             } else {
-                if (strpos($parsed[0], 'enabled') || strpos($parsed[0], 'collapsed')) {
-                    $this->setValueByDot($originalElement, $parsed[0], $parsed[1]);
+                if (strpos($line[0], 'enabled') || strpos($line[0], 'collapsed')) {
+                    $this->setValueByDot($originalElement, $line[0], $line[1]);
                 } else {
-                    $this->setValueByDot($originalElement, $parsed[0], $parsed[2]);
+                    $this->setValueByDot($originalElement, $line[0], $line[2]);
                 }
             }
         }
+
+        unlink($filepath . DIRECTORY_SEPARATOR . 'csv_' . $filename);
+        unlink($filepath . DIRECTORY_SEPARATOR . $filename);
 
         return $originalElement;
     }

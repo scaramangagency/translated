@@ -138,3 +138,14 @@
 .translated .data .heading {
     flex: 0 0 115px !important;
 }
+
+.sync-error {
+    margin-top: -16px !important;
+    margin-bottom: 16px;
+}
+
+.pm-error {
+    font-weight: bold;
+    text-decoration: underline;
+    color: #cf1124;
+}

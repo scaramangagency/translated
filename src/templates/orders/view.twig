@@ -84,6 +84,15 @@
                     <span data-icon="info"></span> Your order has been completed.
                 </p>
                 <hr />
+
+                {% if orderStatusFromHTS %}
+                    <div id="alerts" class="mb-8">
+                        <p>
+                            If there are any issues when you download your file, contact your project manager <a class="pm-error" href="mailto:{{ orderStatusFromHTS[0].pm_email ?? orderStatusFromHTS.pm_email }}">{{ orderStatusFromHTS[0].pm_name
+                                    ?? orderStatusFromHTS.pm_name }}</a>
+                        </p>
+                    </div>
+                {% endif %}
                 <p>
                     <strong class="knock">Translated Content</strong>
                 </p>

@@ -11,9 +11,9 @@
 namespace scaramangagency\translated\controllers;
 
 use scaramangagency\translated\Translated;
+use scaramangagency\translated\elements\Order as Order;
 use scaramangagency\translated\services\DataService;
 use scaramangagency\translated\services\UtilityService;
-use scaramangagency\translated\elements\Order as Order;
 
 use Craft;
 use craft\elements\Asset;
@@ -153,7 +153,7 @@ class OrdersController extends Controller
         $data['projectName'] = $element->title;
         $data['wordCount'] = translated::$plugin->dataService->getWordCount($element);
         $data['translationNotes'] =
-            "Please translate text from RAW column into TRANSLATED column. If possible, please try to retain any HTML markup for paragraphs or headings. \r\n";
+            "You must provide the delivery file as a CSV (file extension .csv) with the supplied three columns intact (HANDLE, RAW, TRANSLATED). Do not supply a .xls or a .xlsx file. Please do not delete any rows. Translate text that exists in the RAW column into TRANSLATED column. If possible, please try to retain any HTML markup for paragraphs or headings. \r\n";
         $data['entryId'] = $element->id;
         $data['auto'] = 1;
 
@@ -314,8 +314,8 @@ class OrdersController extends Controller
             if (!$getOrderStatus) {
                 $orderStatusFromHTS = null;
             } else {
-                $massage = (array) $getOrderStatus;
-                $orderStatusFromHTS = $massage[0];
+                $message = (array) $getOrderStatus;
+                $orderStatusFromHTS = $message[0];
             }
         }
 
@@ -403,15 +403,18 @@ class OrdersController extends Controller
         exit();
     }
 
-    public function actionSyncResponse($orderId)
+    public function actionSyncResponse($orderId, $failed = false)
     {
-        if ($orderId) {
-            $data = translated::$plugin->orderService->getOrder($orderId);
+        if (!$orderId) {
+            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get delivery file'));
+            return $this->redirect(Craft::$app->getRequest()->referrer);
+        }
 
-            if (!$data) {
-                Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get delivery file'));
-                return $this->redirect(Craft::$app->getRequest()->referrer);
-            }
+        $data = translated::$plugin->orderService->getOrder($orderId);
+
+        if (!$data) {
+            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get delivery file'));
+            return $this->redirect(Craft::$app->getRequest()->referrer);
         }
 
         $availableSites = translated::$plugin->utilityService->fetchAvailableSites();
@@ -429,8 +432,14 @@ class OrdersController extends Controller
         $syncData = translated::$plugin->dataService->updateEntryFromTranslationCSV($data);
 
         if (!$syncData) {
-            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get order'));
-            return $this->redirect(Craft::$app->getRequest()->referrer);
+            $orderInfo = translated::$plugin->orderService->getOrderStatus($data['id']);
+            $availableSites = translated::$plugin->utilityService->fetchAvailableSites();
+
+            return $this->renderTemplate('translated/orders/sync', [
+                'data' => $data,
+                'availableSites' => $availableSites,
+                'orderInfo' => (array) $orderInfo
+            ]);
         }
 
         $element = Entry::find()
@@ -450,7 +459,7 @@ class OrdersController extends Controller
 
         $element->setFieldValues($syncData);
 
-        $success = Craft::$app->elements->saveElement($element, true, false);
+        $success = Craft::$app->elements->saveElement($element, false, false);
 
         if (!$success) {
             Craft::$app->getSession()->setError(Craft::t('app', 'Failed to sync data to entry'));

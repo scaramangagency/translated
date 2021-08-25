@@ -136,7 +136,12 @@ class UtilityService extends Component
     {
         $sites = Craft::$app->sites->allSites;
 
-        $decorateSites = [];
+        $decorateSites = [
+            [
+                'label' => 'Please select...',
+                'value' => ''
+            ]
+        ];
 
         foreach ($sites as $site) {
             $decorateSites[] = [
