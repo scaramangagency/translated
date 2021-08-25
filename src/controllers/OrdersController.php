@@ -153,7 +153,7 @@ class OrdersController extends Controller
         $data['projectName'] = $element->title;
         $data['wordCount'] = translated::$plugin->dataService->getWordCount($element);
         $data['translationNotes'] =
-            "You must provide the delivery file as a CSV (.csv) or an XLSX (.xlsx) with the supplied three columns intact (HANDLE, RAW, TRANSLATED). Please do not delete any rows. Translate text that exists in the RAW column into TRANSLATED column. If possible, please try to retain any HTML markup for paragraphs or headings. \r\n";
+            "You must provide the delivery file as a CSV (.csv) or an XLSX (.xlsx) with the supplied three columns intact (HANDLE, RAW, TRANSLATED). Please do not delete any rows. Translate text that exists in the RAW column into TRANSLATED column.\r\n";
         $data['entryId'] = $element->id;
         $data['auto'] = 1;
 
