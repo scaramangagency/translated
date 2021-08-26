@@ -2,11 +2,11 @@
 
 Website Internationalisation is fine until you need to suddenly need to speak 10 different languages and fluently enough to translate technical content. This is where the fabulous Translated plugin steps in. Select a page. Click the Translate button. Send it to the Translated translation service. Approve the quote. Receive the translated content back directly in Craft and sync it to the original Craft entry. Et voilà!
 
-There are no nasty surprises. _Translated plugin_ displays a quote from Translated, so you know what the translation will cost in advance\* --- with no sneaky markup from Scaramanga!
+There are no nasty surprises. _Translated_ plugin displays a quote from Translated, so you know what the translation will cost in advance\* &mdash; with no sneaky markup from Scaramanga!
 
 With Translated's tiered service levels (Economy, Premium or Professional) it is easy to control costs. Use the Economy level for the less important pages and Professional for key pages where the translation needs to be spot on.
 
-The _Translated plugin_ puts content authors in full control. Translate what you want, when you want. Whether that's an entire website or a single page. With 195 languages covered and 40 areas of expertise, the **Translated plugin** is perfect for maintaining the content for multi-language websites on an ongoing basis.
+The _Translated_ plugin puts content authors in full control. Translate what you want, when you want. Whether that's an entire website or a single page. With 195 languages covered and 40 areas of expertise, the _Translated_ plugin is perfect for maintaining the content for multi-language websites on an ongoing basis.
 
 \*The estimate is based on word count, which the plugin automatically generates from the extracted content. This should be accurate; however, it is possible that the invoiced amount differs lightly from the estimate due to a final word count. This could be slightly lower or higher than the estimated amount.
 
