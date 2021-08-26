@@ -168,11 +168,11 @@ You can now visit the entry to check everything has been applied correctly.
 
 ## Order statuses
 
--   _Pending_ &mdash; The order has been generated, but it still needs to be Rejected or Approved.
--   _Processing_ &mdash; The order has been successfully submitted to Translated.
--   _Delivered_ &mdash; The translation has been completed by Translated's translator and the file has been returned containing the translated content.
--   _Rejected_ &mdash; Contains a list of quotes rejected by the user.
--   _Expired_ &mdash; Contains a list of expired quotes that were not approved or rejected by the user within 24 hours.
+-   **Pending** &mdash; The order has been generated, but it still needs to be Rejected or Approved.
+-   **Processing** &mdash; The order has been successfully submitted to Translated.
+-   **Delivered** &mdash; The translation has been completed by Translated's translator and the file has been returned containing the translated content.
+-   **Rejected** &mdash; Contains a list of quotes rejected by the user.
+-   **Expired** &mdash; Contains a list of expired quotes that were not approved or rejected by the user within 24 hours.
 
 ## Paying for your translation
 
