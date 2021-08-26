@@ -166,27 +166,13 @@ You will be redirected back to the **Sync Entry** page and see a success notific
 
 You can now visit the entry to check everything has been applied correctly.
 
-### Order statuses
+## Order statuses
 
-#### Pending
-
-The order has been generated, but it still needs to be Rejected or Approved.
-
-#### Processing
-
-The order has been successfully submitted to Translated.
-
-#### Delivered
-
-The translation has been completed by Translated's translator and the file has been returned containing the translated content.
-
-#### Rejected
-
-Contains a list of quotes rejected by the user.
-
-#### Expired
-
-Contains a list of expired quotes that were not approved or rejected by the user within 24 hours.
+-   _Pending_ &mdash; The order has been generated, but it still needs to be Rejected or Approved.
+-   _Processing_ &mdash; The order has been successfully submitted to Translated.
+-   _Delivered_ &mdash; The translation has been completed by Translated's translator and the file has been returned containing the translated content.
+-   _Rejected_ &mdash; Contains a list of quotes rejected by the user.
+-   _Expired_ &mdash; Contains a list of expired quotes that were not approved or rejected by the user within 24 hours.
 
 ## Paying for your translation
 
