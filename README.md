@@ -36,7 +36,7 @@ You can also visit the [Craft Plugin Store](https://plugins.craftcms.com/), sear
 
 ## Configuring Translated
 
-### Assign user permissions
+### Assigning user permissions
 
 The _Translated_ plugin offers granular user permission, which you must add to existing and new user groups.
 
@@ -80,7 +80,7 @@ Please note that the _Translated plugin_ also works with the following nestable 
 -   Supertable
 -   Neo
 
-#### Important notes
+#### Important notes
 
 -   A Section must be assigned to more than one site before the **Translate** button appears. If the button is not visible on the Entry then check your Section settings.
 -   Only fields assigned as translatable (using the Translation Method select menu for each field) will be included in the file sent to Translated. Matrix, Supertable, and Neo fields themselves do not have to be set as translatable, as the plugin will scan them for translatable Plain Text and Redactor fields.
