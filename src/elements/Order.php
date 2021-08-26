@@ -303,6 +303,8 @@ class Order extends Element
             'dateCreated' => ['label' => 'Requested on'],
             'orderStatus' => ['label' => 'Status'],
             'quoteTotal' => ['label' => 'Quote total'],
+            'sourceLanguage' => ['label' => 'Source language'],
+            'targetLanguage' => ['label' => 'Target language'],
             'estimatedDeliveryDate' => ['label' => 'Delivery date'],
             'ownedBy' => ['label' => 'Requested by'],
             'reviewedBy' => ['label' => 'Reviewed by'],
@@ -319,6 +321,8 @@ class Order extends Element
         $attributes[] = 'orderStatus';
         $attributes[] = 'dateCreated';
         $attributes[] = 'ownedBy';
+        $attributes[] = 'sourceLanguage';
+        $attributes[] = 'targetLanguage';
 
         if ($source == 'orderStatus:1') {
             $attributes[] = 'quoteTotal';

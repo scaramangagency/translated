@@ -45,7 +45,9 @@ class OrderQuery extends ElementQuery
             'translated_orders.dateFulfilled',
             'translated_orders.orderStatus',
             'translated_orders.quoteDeliveryDate',
-            'translated_orders.quoteTotal'
+            'translated_orders.quoteTotal',
+            'translated_orders.sourceLanguage',
+            'translated_orders.targetLanguage'
         ]);
 
         if ($this->orderStatus) {
