@@ -1,8 +1,8 @@
-# translated plugin for Craft CMS 3.x
+# Translated plugin for Craft CMS 3.x
 
 Website Internationalisation is fine until you need to suddenly need to speak 10 different languages and fluently enough to translate technical content. This is where the fabulous Translated plugin steps in. Select a page. Click the Translate button. Send it to the Translated translation service. Approve the quote. Receive the translated content back directly in Craft and sync it to the original Craft entry. Et voilà!
 
-There are no nasty surprises. _Translated_ plugin displays a quote from Translated, so you know what the translation will cost in advance\* &mdash; with no sneaky markup from Scaramanga!
+There are no nasty surprises. The _Translated_ plugin displays a quote from Translated, so you know what the translation will cost in advance!\*
 
 With Translated's tiered service levels (Economy, Premium or Professional) it is easy to control costs. Use the Economy level for the less important pages and Professional for key pages where the translation needs to be spot on.
 
@@ -184,7 +184,13 @@ All billing enquiries should be directed to Translated.
 
 ### Why does the data being returned not contain the same formatting?
 
-The auto-generated file is sent as a CSV file, which cannot retain the text formatting. Translated returns the file in the XLSX format, again, a format that does not contain text formatting. Unfortunately, there isn't anything we can do about this. Content authors will need to review the translated content and add the relevant formatting manually, however, at least they do not need to do the translation. Small wins!
+The auto-generated file is sent as a CSV file, which does retain the text formatting. Translated.com returns the file as an XLSX file, again, a format that does not allow text formatting. Unfortunately, there isn't anything we can do about this.
+
+Content authors will need to review the translated content and add the relevant formatting manually, however, at least they do not need to do the translation. Small wins!
+
+### Are there any hidden fees?
+
+No. All payments are made directly between the client and Translated.com.
 
 ## Disclaimer
 
