@@ -72,7 +72,7 @@ class OrdersController extends Controller
             $data = translated::$plugin->orderService->getOrder($id);
 
             if (!$data) {
-                Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get quote to duplicate'));
+                Craft::$app->getSession()->setError(Craft::t('translated', 'Failed to get quote to duplicate'));
                 return $this->redirect(UrlHelper::cpUrl('translated/orders'));
             }
 
@@ -91,7 +91,7 @@ class OrdersController extends Controller
         if (!$availableLanguages || !$availableSubjects) {
             Craft::$app
                 ->getSession()
-                ->setError(Craft::t('app', 'Sorry, there appears to be an issue with the translated API'));
+                ->setError(Craft::t('translated', 'Sorry, there appears to be an issue with the translated API'));
             return $this->redirect(UrlHelper::cpUrl('translated/orders'));
         }
 
@@ -132,12 +132,12 @@ class OrdersController extends Controller
         $element = Craft::$app->getEntries()->getEntryById($id, $siteId);
 
         if (!$element) {
-            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get get content from this entry'));
+            Craft::$app->getSession()->setError(Craft::t('translated', 'Failed to get get content from this entry'));
             return $this->redirect(Craft::$app->getRequest()->referrer);
         }
 
         if (!$element->getFieldLayout()) {
-            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get get content from this entry'));
+            Craft::$app->getSession()->setError(Craft::t('translated', 'Failed to get get content from this entry'));
             return $this->redirect(Craft::$app->getRequest()->referrer);
         }
 
@@ -163,7 +163,7 @@ class OrdersController extends Controller
         if (!$availableLanguages || !$availableSubjects) {
             Craft::$app
                 ->getSession()
-                ->setError(Craft::t('app', 'Sorry, there appears to be an issue with the translated API'));
+                ->setError(Craft::t('translated', 'Sorry, there appears to be an issue with the translated API'));
             return $this->redirect(UrlHelper::cpUrl('translated/orders'));
         }
 
@@ -198,7 +198,7 @@ class OrdersController extends Controller
         $quoteId = translated::$plugin->orderService->handleQuote($data);
 
         if (!$quoteId['success'] && array_key_exists('errors', $quoteId)) {
-            Craft::$app->getSession()->setError(Craft::t('app', 'Could not save quote'));
+            Craft::$app->getSession()->setError(Craft::t('translated', 'Could not save quote'));
 
             Craft::$app->getUrlManager()->setRouteParams([
                 'errors' => $quoteId['errors'],
@@ -221,11 +221,11 @@ class OrdersController extends Controller
         $approveQuote = translated::$plugin->orderService->approveQuote($id);
 
         if (!$approveQuote) {
-            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to authorise order'));
+            Craft::$app->getSession()->setError(Craft::t('translated', 'Failed to authorise order'));
             return $this->redirect(UrlHelper::cpUrl('translated/orders'));
         }
 
-        Craft::$app->getSession()->setNotice(Craft::t('app', 'Quote converted to order'));
+        Craft::$app->getSession()->setNotice(Craft::t('translated', 'Quote converted to order'));
         return $this->redirect(UrlHelper::cpUrl('translated/orders'));
     }
 
@@ -234,11 +234,11 @@ class OrdersController extends Controller
         $getQuote = translated::$plugin->orderService->handleQuote(null, $id);
 
         if (!$getQuote) {
-            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to refresh quote'));
+            Craft::$app->getSession()->setError(Craft::t('translated', 'Failed to refresh quote'));
             return $this->redirect(UrlHelper::cpUrl('translated/orders'));
         }
 
-        Craft::$app->getSession()->setNotice(Craft::t('app', 'Quote successfully refreshed'));
+        Craft::$app->getSession()->setNotice(Craft::t('translated', 'Quote successfully refreshed'));
         return $this->redirect(UrlHelper::cpUrl('translated/orders/view/' . $id));
     }
 
@@ -247,11 +247,11 @@ class OrdersController extends Controller
         $rejectQuote = translated::$plugin->orderService->rejectQuote($id);
 
         if (!$rejectQuote) {
-            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to reject quote'));
+            Craft::$app->getSession()->setError(Craft::t('translated', 'Failed to reject quote'));
             return $this->redirect(UrlHelper::cpUrl('translated/orders'));
         }
 
-        Craft::$app->getSession()->setNotice(Craft::t('app', 'Quote successfully rejected'));
+        Craft::$app->getSession()->setNotice(Craft::t('translated', 'Quote successfully rejected'));
         return $this->redirect(UrlHelper::cpUrl('translated/orders'));
     }
 
@@ -260,7 +260,7 @@ class OrdersController extends Controller
         $order = translated::$plugin->orderService->getOrder($id);
 
         if (!$order) {
-            Craft::$app->getSession()->setError(Craft::t('app', 'An order does not exist with that ID'));
+            Craft::$app->getSession()->setError(Craft::t('translated', 'An order does not exist with that ID'));
             return $this->redirect(UrlHelper::cpUrl('translated/orders'));
         }
 
@@ -280,31 +280,31 @@ class OrdersController extends Controller
                 $dt = new \DateTime($order->dateCreated);
 
                 if ($dt->format('c') > $dd->format('c')) {
-                    $status = 'Pending';
+                    $status = Craft::t('translated', 'Pending');
                 } else {
-                    $status = 'Expired';
+                    $status = Craft::t('translated', 'Expired');
                 }
                 break;
             case 2:
-                $status = 'Processing';
+                $status = Craft::t('translated', 'Processing');
                 break;
             case 3:
-                $status = 'Delivered';
+                $status = Craft::t('translated', 'Delivered');
                 break;
             case 4:
-                $status = 'Rejected';
+                $status = Craft::t('translated', 'Rejected');
                 break;
         }
 
         switch ($order->translationLevel) {
             case 'T':
-                $service = 'Professional';
+                $service = Craft::t('translated', 'Professional');
                 break;
             case 'R':
-                $service = 'Premium';
+                $service = Craft::t('translated', 'Premium');
                 break;
             case 'P':
-                $service = 'Economy';
+                $service = Craft::t('translated', 'Economy');
                 break;
         }
 
@@ -354,7 +354,7 @@ class OrdersController extends Controller
             readfile($filepath);
             exit();
         } else {
-            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to download autogenerated file'));
+            Craft::$app->getSession()->setError(Craft::t('translated', 'Failed to download autogenerated file'));
             return $this->redirect(Craft::$app->getRequest()->referrer);
         }
     }
@@ -365,7 +365,7 @@ class OrdersController extends Controller
             $data = translated::$plugin->orderService->getOrder($orderId);
 
             if (!$data) {
-                Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get delivery file'));
+                Craft::$app->getSession()->setError(Craft::t('translated', 'Failed to get delivery file'));
                 return $this->redirect(Craft::$app->getRequest()->referrer);
             }
         }
@@ -406,14 +406,14 @@ class OrdersController extends Controller
     public function actionSyncResponse($orderId, $failed = false)
     {
         if (!$orderId) {
-            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get delivery file'));
+            Craft::$app->getSession()->setError(Craft::t('translated', 'Failed to get delivery file'));
             return $this->redirect(Craft::$app->getRequest()->referrer);
         }
 
         $data = translated::$plugin->orderService->getOrder($orderId);
 
         if (!$data) {
-            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to get delivery file'));
+            Craft::$app->getSession()->setError(Craft::t('translated', 'Failed to get delivery file'));
             return $this->redirect(Craft::$app->getRequest()->referrer);
         }
 
@@ -462,10 +462,10 @@ class OrdersController extends Controller
         $success = Craft::$app->elements->saveElement($element, false, false);
 
         if (!$success) {
-            Craft::$app->getSession()->setError(Craft::t('app', 'Failed to sync data to entry'));
+            Craft::$app->getSession()->setError(Craft::t('translated', 'Failed to sync data to entry'));
             return $this->redirect(Craft::$app->getRequest()->referrer);
         } else {
-            Craft::$app->getSession()->setNotice(Craft::t('app', 'Translated data synced to entry'));
+            Craft::$app->getSession()->setNotice(Craft::t('translated', 'Translated data synced to entry'));
             return $this->redirect(UrlHelper::cpUrl('translated/orders/sync/' . $data['id']));
         }
     }

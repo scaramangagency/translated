@@ -14,7 +14,7 @@ class DeleteAction extends ElementAction
 
     public function getTriggerLabel(): string
     {
-        return 'Delete';
+        return Craft::t('translated', 'Delete');
     }
 
     public static function isDestructive(): bool

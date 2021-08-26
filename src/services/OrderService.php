@@ -88,7 +88,7 @@ class OrderService extends Component
             $orderRecord = Craft::$app->getElements()->getElementById($id, Order::class);
 
             if (!$orderRecord) {
-                return ['success' => false, 'response' => 'Could not find order record'];
+                return ['success' => false, 'response' => Craft::t('translated', 'Could not find order record')];
             }
 
             $orderRecord->dateCreated = new \DateTime();
@@ -161,19 +161,28 @@ class OrderService extends Component
             $res = curl_exec($ch);
             curl_close($ch);
         } catch (Exception $e) {
-            return ['success' => false, 'response' => 'Sorry, there appears to be an issue with the translated API'];
+            return [
+                'success' => false,
+                'response' => Craft::t('translated', 'Sorry, there appears to be an issue with the translated API')
+            ];
         }
 
         $res = json_decode($res);
 
         if ($res->code == 0) {
-            return ['success' => false, 'response' => 'Sorry, there appears to be an issue with the translated API'];
+            return [
+                'success' => false,
+                'response' => Craft::t('translated', 'Sorry, there appears to be an issue with the translated API')
+            ];
         }
 
         $success = $this->_attachQuote($orderRecord->id, $res);
 
         if (!$success) {
-            return ['success' => false, 'response' => 'Sorry, there appears to be an issue with the translated API'];
+            return [
+                'success' => false,
+                'response' => Craft::t('translated', 'Sorry, there appears to be an issue with the translated API')
+            ];
         }
 
         return ['success' => true, 'response' => $orderRecord->id];

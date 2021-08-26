@@ -46,7 +46,7 @@ class SettingsController extends Controller
         }
 
         if (!Craft::$app->getPlugins()->savePluginSettings($plugin, $settings)) {
-            Craft::$app->getSession()->setError(Craft::t('app', "Couldn't save plugin settings"));
+            Craft::$app->getSession()->setError(Craft::t('translated', "Couldn't save plugin settings"));
 
             Craft::$app->getUrlManager()->setRouteParams([
                 'plugin' => $plugin
@@ -55,7 +55,7 @@ class SettingsController extends Controller
             return null;
         }
 
-        Craft::$app->getSession()->setNotice(Craft::t('app', 'Plugin settings saved'));
+        Craft::$app->getSession()->setNotice(Craft::t('translated', 'Plugin settings saved'));
         return $this->redirectToPostedUrl();
     }
 }

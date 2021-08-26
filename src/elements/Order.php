@@ -92,7 +92,7 @@ class Order extends Element
             'when' => function () {
                 return !$this->translationContent;
             },
-            'message' => 'Please either upload an asset or supply text to be translated.'
+            'message' => Craft::t('translated', 'Please either upload an asset or supply text to be translated.')
         ];
         $rules[] = [
             'translationContent',
@@ -100,7 +100,7 @@ class Order extends Element
             'when' => function () {
                 return !$this->translationAsset;
             },
-            'message' => 'Please either upload an asset or supply text to be translated.'
+            'message' => Craft::t('translated', 'Please either upload an asset or supply text to be translated.')
         ];
         return $rules;
     }
@@ -111,12 +111,12 @@ class Order extends Element
             '*' => [
                 'defaultSort' => ['translated_orders.dateCreated', 'desc'],
                 'key' => '*',
-                'label' => 'All Orders'
+                'label' => Craft::t('translated', 'All Orders')
             ],
             'orderStatus:1' => [
                 'defaultSort' => ['translated_orders.dateCreated', 'desc'],
                 'key' => 'orderStatus:1',
-                'label' => 'Pending',
+                'label' => Craft::t('translated', 'Pending'),
                 'criteria' => [
                     'orderStatus' => self::STATUS_PENDING,
                     'expired' => false,
@@ -126,25 +126,25 @@ class Order extends Element
             'orderStatus:2' => [
                 'defaultSort' => ['translated_orders.dateCreated', 'desc'],
                 'key' => 'orderStatus:2',
-                'label' => 'Processing',
+                'label' => Craft::t('translated', 'Processing'),
                 'criteria' => ['orderStatus' => self::STATUS_PROCESSING]
             ],
             'orderStatus:3' => [
                 'defaultSort' => ['translated_orders.dateCreated', 'desc'],
                 'key' => 'orderStatus:3',
-                'label' => 'Delivered',
+                'label' => Craft::t('translated', 'Delivered'),
                 'criteria' => ['orderStatus' => [self::STATUS_DELIVERED, self::STATUS_FAILED]]
             ],
             'orderStatus:4' => [
                 'defaultSort' => ['translated_orders.dateCreated', 'desc'],
                 'key' => 'orderStatus:4',
-                'label' => 'Rejected',
+                'label' => Craft::t('translated', 'Rejected'),
                 'criteria' => ['orderStatus' => self::STATUS_REJECTED]
             ],
             'orderStatus:5' => [
                 'defaultSort' => ['translated_orders.dateCreated', 'desc'],
                 'key' => 'orderStatus:5',
-                'label' => 'Expired',
+                'label' => Craft::t('translated', 'Expired'),
                 'criteria' => [
                     'orderStatus' => self::STATUS_PENDING,
                     'expired' => true,
@@ -164,8 +164,11 @@ class Order extends Element
 
         $actions[] = $elementsService->createAction([
             'type' => DeleteAction::class,
-            'confirmationMessage' => 'Are you sure you want to permanently delete the selected orders?',
-            'successMessage' => 'Orders deleted.'
+            'confirmationMessage' => Craft::t(
+                'translated',
+                'Are you sure you want to permanently delete the selected orders?'
+            ),
+            'successMessage' => Craft::t('translated', 'Orders deleted.')
         ]);
 
         return $actions;
@@ -226,22 +229,22 @@ class Order extends Element
                 $now = new \DateTime();
 
                 if ($now->format('c') < $dd->format('c')) {
-                    $status = 'Pending';
+                    $status = Craft::t('translated', 'Pending');
                 } else {
-                    $status = 'Expired';
+                    $status = Craft::t('translated', 'Expired');
                 }
                 break;
             case 2:
-                $status = 'Processing';
+                $status = Craft::t('translated', 'Processing');
                 break;
             case 3:
-                $status = 'Delivered';
+                $status = Craft::t('translated', 'Delivered');
                 break;
             case 4:
-                $status = 'Rejected';
+                $status = Craft::t('translated', 'Rejected');
                 break;
             default:
-                $status = 'Pending';
+                $status = Craft::t('translated', 'Pending');
                 break;
         }
         return '<span class="label order-status ' . strtolower($status) . '">' . $status . '</span>';
@@ -299,18 +302,18 @@ class Order extends Element
     protected static function defineTableAttributes(): array
     {
         return [
-            'title' => ['label' => 'Title'],
-            'dateCreated' => ['label' => 'Requested on'],
-            'orderStatus' => ['label' => 'Status'],
-            'quoteTotal' => ['label' => 'Quote total'],
-            'sourceLanguage' => ['label' => 'Source language'],
-            'targetLanguage' => ['label' => 'Target language'],
-            'estimatedDeliveryDate' => ['label' => 'Delivery date'],
-            'ownedBy' => ['label' => 'Requested by'],
-            'reviewedBy' => ['label' => 'Reviewed by'],
-            'dateApproved' => ['label' => 'Approved on'],
-            'dateRejected' => ['label' => 'Rejected on'],
-            'dateFulfilled' => ['label' => 'Fulfilled on']
+            'title' => ['label' => Craft::t('translated', 'Title')],
+            'dateCreated' => ['label' => Craft::t('translated', 'Requested on')],
+            'orderStatus' => ['label' => Craft::t('translated', 'Status')],
+            'quoteTotal' => ['label' => Craft::t('translated', 'Quote total')],
+            'sourceLanguage' => ['label' => Craft::t('translated', 'Source language')],
+            'targetLanguage' => ['label' => Craft::t('translated', 'Target language')],
+            'estimatedDeliveryDate' => ['label' => Craft::t('translated', 'Delivery date')],
+            'ownedBy' => ['label' => Craft::t('translated', 'Requested by')],
+            'reviewedBy' => ['label' => Craft::t('translated', 'Reviewed by')],
+            'dateApproved' => ['label' => Craft::t('translated', 'Approved on')],
+            'dateRejected' => ['label' => Craft::t('translated', 'Rejected on')],
+            'dateFulfilled' => ['label' => Craft::t('translated', 'Fulfilled on')]
         ];
     }
 
@@ -354,8 +357,8 @@ class Order extends Element
     protected static function defineSortOptions(): array
     {
         return [
-            'title' => 'Title',
-            'dateCreated' => 'Requested on'
+            'title' => Craft::t('translated', 'Title'),
+            'dateCreated' => Craft::t('translated', 'Requested on')
         ];
     }
 

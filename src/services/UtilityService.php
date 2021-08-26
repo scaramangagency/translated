@@ -54,7 +54,7 @@ class UtilityService extends Component
 
         $decorateLanguages = [];
 
-        $decorateLanguages[] = ['label' => 'Please select...', 'value' => ''];
+        $decorateLanguages[] = ['label' => Craft::t('translated', 'Please select...'), 'value' => ''];
 
         $selectedSource = '';
         $selectedTarget = [];
@@ -138,7 +138,7 @@ class UtilityService extends Component
 
         $decorateSites = [
             [
-                'label' => 'Please select...',
+                'label' => Craft::t('translated', 'Please select...'),
                 'value' => ''
             ]
         ];

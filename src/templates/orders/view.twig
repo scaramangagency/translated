@@ -11,25 +11,33 @@
         url: url('translated')
     },
     {
-        label: 'Orders',
+        label: 'Orders'|t('translated'),
         url: url('translated/orders')
     }
 ] %}
 
 {% block actionButton %}
     <div class="buttons">
-        <a href="{{ cpUrl('translated/orders/duplicate/' ~ order.id) }}" class="btn tertiary">Duplicate Quote</a>
+        <a href="{{ cpUrl('translated/orders/duplicate/' ~ order.id) }}" class="btn tertiary">
+            {{ 'Duplicate Quote'|t('translated') }}
+        </a>
 
         {% if
             orderPermissions
                 and order.orderStatus == 1
                 and (order.dateCreated|date('c')) > (date('-1 day')|date('c')) %}
-            <a href="{{ cpUrl('translated/orders/reject/' ~ order.id) }}" class="btn submit secondary">Reject Quote</a>
-            <a href="{{ cpUrl('translated/orders/approve/' ~ order.id) }}" class="btn submit">Approve Quote</a>
+            <a href="{{ cpUrl('translated/orders/reject/' ~ order.id) }}" class="btn submit secondary">
+                {{ 'Reject Quote'|t('translated') }}
+            </a>
+            <a href="{{ cpUrl('translated/orders/approve/' ~ order.id) }}" class="btn submit">
+                {{ 'Approve Quote'|t('translated') }}
+            </a>
         {% endif %}
 
         {% if requestQuote and order.orderStatus == 1 and (order.dateCreated|date('c')) < (date('-1 day')|date('c')) %}
-            <a href="{{ cpUrl('translated/orders/refresh/' ~ order.id) }}" class="btn submit">Refresh Quote</a>
+            <a href="{{ cpUrl('translated/orders/refresh/' ~ order.id) }}" class="btn submit">
+                {{ 'Refresh Quote'|t('translated') }}
+            </a>
         {% endif %}
     </div>
 {% endblock %}
@@ -41,7 +49,7 @@
                 {% if order.orderStatus == 2 or order.orderStatus == 3 %}
                     <li data-id="0">
                         <a id="tab-0" class="tab sel" href="#tab-fulfilled" title="Fulfilled" aria-label="Fulfilled">
-                            Delivery
+                            {{ 'Delivery'|t('translated') }}
                         </a>
                     </li>
                 {% endif %}
@@ -51,7 +59,7 @@
                         href="#tab-information"
                         title="Information"
                         aria-label="Information">
-                        Order Information
+                        {{ 'Order Information'|t('translated') }}
                     </a>
                 </li>
             </ul>
@@ -69,38 +77,55 @@
             {% if order.orderStatus == 2 %}
                 {% if not orderStatusFromHTS %}
                     <p class="error">
-                        <span data-icon="info"></span> Failed to get the status of this order. Please try again later.
+                        <span data-icon="info"></span>
+                        {{ 'Failed to get the status of this order. Please try again later.'|t('translated') }}
                     </p>
                 {% else %}
                     <p class="processing">
-                        <span data-icon="info"></span> Your order is still being processed. Please check back again after
-                        the delivery date has passed.
+                        <span data-icon="info"></span>
+                        {{
+                            'Your order is still being processed. Please check back again after
+                        the delivery date has passed.'|t(
+                                'translated'
+                            )
+                        }}
                     </p>
                 {% endif %}
             {% endif %}
 
             {% if order.orderStatus == 3 %}
                 <p>
-                    <span data-icon="info"></span> Your order has been completed.
+                    <span data-icon="info"></span> {{ 'Your order has been completed.'|t('translated') }}
                 </p>
                 <hr />
 
                 {% if orderStatusFromHTS %}
                     <div id="alerts" class="mb-8">
                         <p>
-                            If there are any issues when you download your file, contact your project manager <a class="pm-error" href="mailto:{{ orderStatusFromHTS[0].pm_email ?? orderStatusFromHTS.pm_email }}">{{ orderStatusFromHTS[0].pm_name
-                                    ?? orderStatusFromHTS.pm_name }}</a>
+                            {{
+                                'If there are any issues when you download your file, contact your project manager'|t(
+                                    'translated'
+                                )
+                            }}
+                            <a class="pm-error"
+                                href="mailto:{{ orderStatusFromHTS[0].pm_email ?? orderStatusFromHTS.pm_email }}">
+                                {{ orderStatusFromHTS[0].pm_name ?? orderStatusFromHTS.pm_name }}
+                            </a>
                         </p>
                     </div>
                 {% endif %}
                 <p>
-                    <strong class="knock">Translated Content</strong>
+                    <strong class="knock">{{ 'Translated Content'|t('translated') }}</strong>
                 </p>
                 {% if order.translationAsset %}
-                    <a href="{{ cpUrl('translated/orders/delivery/' ~ order.id) }}" class="btn">Download Content</a>
+                    <a href="{{ cpUrl('translated/orders/delivery/' ~ order.id) }}" class="btn">
+                        {{ 'Download Content'|t('translated') }}
+                    </a>
                 {% endif %}
                 {% if order.auto == 1 and syncOrder %}
-                    <a href="{{ cpUrl('translated/orders/sync/' ~ order.id) }}" class="btn submit">Sync to Entry</a>
+                    <a href="{{ cpUrl('translated/orders/sync/' ~ order.id) }}" class="btn submit">
+                        {{ 'Sync to Entry'|t('translated') }}
+                    </a>
                 {% else %}
                     {{ order.translatedContent|nl2br }}
                 {% endif %}
@@ -119,9 +144,11 @@
         <div class="full">
             <strong class="knock">Level</strong>
             <div class="info">
-                [£] Economy – Machine Translation with light human review.<br />
-                [££] Premium – Human Translation with quality control.<br />
-                [£££] Professional – Human Translation with specialist review and quality control.
+                [£] {{ 'Economy – Machine Translation with light human review.'|t('translated') }}<br />
+                [££] {{ 'Premium – Human Translation with quality control.'|t('translated') }}<br />
+                [£££] {{
+                    'Professional – Human Translation with specialist review and quality control.'|t('translated')
+                }}
             </div>
             <br />
             {{ serviceLevel }}
@@ -129,29 +156,29 @@
 
         <div class="row">
             <div class="half">
-                <strong class="knock">Source Language</strong><br />
+                <strong class="knock">{{ 'Source Language'|t('translated') }}</strong><br />
                 {{ order.sourceLanguage }}
             </div>
             <div class="half">
-                <strong class="knock">Target Language</strong><br />
+                <strong class="knock">{{ 'Target Language'|t('translated') }}</strong><br />
                 {{ order.targetLanguage }}
             </div>
         </div>
 
         <div class="row">
             <div class="half">
-                <strong class="knock">Genre</strong><br />
+                <strong class="knock">{{ 'Genre'|t('translated') }}</strong><br />
                 <span class="capitalise">{{ order.translationSubject }}</span>
             </div>
             <div class="half">
-                <strong class="knock">Word Count</strong><br />
+                <strong class="knock">{{ 'Word Count'|t('translated') }}</strong><br />
                 {{ order.wordCount }}
             </div>
         </div>
 
         {% if order.translationNotes != '' %}
             <div class="full">
-                <strong class="knock">Notes</strong><br />
+                <strong class="knock">{{ 'Notes'|t('translated') }}</strong><br />
                 {{ order.translationNotes }}
             </div>
         {% endif %}
@@ -159,11 +186,11 @@
         {% if order.translationAsset != '' %}
             {% set uploadedAsset = craft.assets.id(order.translationAsset).one() %}
             <div class="full">
-                <a href="{{ uploadedAsset.cpEditUrl }}">View uploaded file</a>
+                <a href="{{ uploadedAsset.cpEditUrl }}">{{ 'View uploaded file'|t('translated') }}</a>
             </div>
         {% else %}
             <div class="full">
-                <strong class="knock">Content</strong><br />
+                <strong class="knock">{{ 'Content'|t('translated') }}</strong><br />
                 {{ order.translationContent|nl2br }}
             </div>
         {% endif %}
@@ -174,7 +201,7 @@
     {% if inSandbox %}
         <div id="alerts" class="mb-8">
             <p>
-                Sandbox mode is enabled
+                {{ 'Sandbox mode is enabled'|t('translated') }}
             </p>
         </div>
     {% endif %}
@@ -182,7 +209,7 @@
     <div class="translated meta information">
         <div class="data primary">
             <h3 class="heading">
-                Total
+                {{ 'Total'|t('translated') }}
             </h3>
             <div class="value">
                 {{ order.quoteTotal|currency('EUR') }}
@@ -191,7 +218,7 @@
         <hr />
         <div class="data">
             <h4 class="heading">
-                Status
+                {{ 'Status'|t('translated') }}
             </h4>
 
             <div class="value">
@@ -203,7 +230,7 @@
             <div class="data">
                 {% if order.orderStatus == 2 and orderStatusFromHTS %}
                     <h4 class="heading">
-                        Delivery Date
+                        {{ 'Delivery date'|t('translated') }}
                     </h4>
                     <div class="value">
                         {{ orderStatusFromHTS.delivery_date|date('short') }}
@@ -211,7 +238,7 @@
                     </div>
                 {% else %}
                     <h4 class="heading">
-                        Delivery Date
+                        {{ 'Delivery date'|t('translated') }}
                     </h4>
                     <div class="value">
                         {{ order.quoteDeliveryDate|date('short') }} {{ order.quoteDeliveryDate|time('short') }}
@@ -221,7 +248,7 @@
         {% else %}
             <div class="data">
                 <h4 class="heading">
-                    Delivered on
+                    {{ 'Delivered on'|t('translated') }}
                 </h4>
                 <div class="value">
                     {{ order.dateFulfilled|date('short') }} {{ order.dateFulfilled|time('short') }}
@@ -233,7 +260,7 @@
             <hr />
             <div class="data">
                 <h4 class="heading">
-                    Date Authorised
+                    {{ 'Approved on'|t('translated') }}
                 </h4>
                 <div class="value">
                     {{ order.dateApproved|date('short') }} {{ order.dateApproved|time('short') }}
@@ -241,32 +268,20 @@
             </div>
             <div class="data">
                 <h4 class="heading">
-                    Reviewed By
+                    {{ 'Reviewed by'|t('translated') }}
                 </h4>
                 {% set reviewedBy = craft.users.id(order.reviewedBy).one() %}
                 <div class="value">
                     <a href="{{ cpUrl('users/' ~ reviewedBy.id) }}">{{ reviewedBy.fullName }}</a>
                 </div>
             </div>
-
-            {% if order.orderStatus == 3 %}
-                <hr />
-                <div class="data">
-                    <h4 class="heading">
-                        Date Fulfilled
-                    </h4>
-                    <div class="value">
-                        {{ order.dateFulfilled|date('short') }} {{ order.dateFulfilled|time('short') }}
-                    </div>
-                </div>
-            {% endif %}
         {% endif %}
 
         {% if order.orderStatus == 4 %}
             <hr />
             <div class="data">
                 <h4 class="heading">
-                    Date Rejected
+                    {{ 'Rejected on'|t('translated') }}
                 </h4>
                 <div class="value">
                     {{ order.dateRejected|date('short') }} {{ order.dateRejected|time('short') }}
@@ -274,7 +289,7 @@
             </div>
             <div class="data">
                 <h4 class="heading">
-                    Rejected By
+                    {{ 'Reviewed by'|t('translated') }}
                 </h4>
                 {% set reviewedBy = craft.users.id(order.reviewedBy).one() %}
                 <div class="value">
@@ -287,7 +302,7 @@
     <div class="translated meta read-only">
         <div class="data">
             <h5 class="heading">
-                Quote Date
+                {{ 'Requested on'|t('translated') }}
             </h5>
             <div class="value">
                 {{ order.dateCreated|date('short') }} {{ order.dateCreated|time('short') }}
@@ -295,7 +310,7 @@
         </div>
         <div class="data">
             <h5 class="heading">
-                Requested By
+                {{ 'Requested by'|t('translated') }}
             </h5>
             {% set orderedBy = craft.users.id(order.userId).one() %}
             <div class="value">

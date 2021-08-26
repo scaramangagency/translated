@@ -11,22 +11,27 @@
         url: url('translated')
     },
     {
-        label: 'Orders',
+        label: 'Orders'|t('translated'),
         url: url('translated/orders')
     }
 ] %}
 
 {% set content %}
     {% if not availableLanguages or not availableSubjects %}
-        Failed to get a response from the translated API. Try again later.
+        {{ 'Failed to get a response from the translated API. Try again later.'|t('translated') }}
     {% else %}
         {% if data and data['failedUpload'] is defined %}
             <ul id="alerts">
                 <li>
-                    <span data-icon="alert" aria-label="Error"></span> Failed to upload the asset automatically. Download
-                    the file and attach it manually below. <a class="go"
-                        href="{{ cpUrl('translated/orders/manual-download?fp=' ~ data['failedUpload']) }}">
-                        Download file
+                    <span data-icon="alert" aria-label="Error"></span>
+                    {{
+                        'Failed to upload the asset automatically. Download
+                    the file and attach it manually below.'|t(
+                            'translated'
+                        )
+                    }}
+                    <a class="go" href="{{ cpUrl('translated/orders/manual-download?fp=' ~ data['failedUpload']) }}">
+                        {{ 'Download file'|t('translated') }}
                     </a>
                 </li>
             </ul>
@@ -40,8 +45,10 @@
             <div class="full">
                 {{
                     forms.textField({
-                        label: 'Project Name',
-                        instructions: 'This will be automatically generated from the entry title, but you can modify it or create your own.',
+                        label: 'Project Name'|t('translated'),
+                        instructions: 'This will be automatically generated from the entry title, but you can modify it or create your own.'|t(
+                            'translated'
+                        ),
                         id: 'title',
                         name: 'title',
                         required: 'required',
@@ -55,13 +62,13 @@
                 <div class="half">
                     {{
                         forms.selectField({
-                            label: 'Translation Level',
+                            label: 'Translation Level'|t('translated'),
                             id: 'translationLevel',
                             name: 'translationLevel',
                             options: {
-                                P: '[£] Economy',
-                                R: '[££] Premium',
-                                T: '[£££] Professional'
+                                P: '[£]' ~ ('Economy'|t('translated')),
+                                R: '[££]' ~ ('Premium'|t('translated')),
+                                T: '[£££]' ~ ('Professional'|t('translated'))
                             },
                             class: 'full',
                             value: form['translationLevel'] ?? data['translationLevel'] ?? 'economy'
@@ -70,20 +77,23 @@
                 </div>
                 <div class="half service-level">
                     <div class="info">
-                        [£] Economy – Machine Translation with light human review.<br />
-                        [££] Premium – Human Translation with quality control.<br />
-                        [£££] Professional – Human Translation with specialist review and quality control.
+                        [£] {{ 'Economy – Machine Translation with light human review.'|t('translated') }}<br />
+                        [££] {{ 'Premium – Human Translation with quality control.'|t('translated') }}<br />
+                        [£££] {{
+                            'Professional – Human Translation with specialist review and quality control.'|t(
+                                'translated'
+                            )
+                        }}
                     </div>
                 </div>
             </div>
 
             <div class="row">
                 <div class="half">
-                    {# TODO: Set default selected language to primary site #}
                     {{
                         forms.selectField({
-                            label: 'Source Language',
-                            instructions: 'Please identify the language of the text to be translated.',
+                            label: 'Source Language'|t('translated'),
+                            instructions: 'Please identify the language of the text to be translated.'|t('translated'),
                             id: 'sourceLanguage',
                             name: 'sourceLanguage',
                             required: 'required',
@@ -97,8 +107,8 @@
                 <div class="half">
                     {{
                         forms.selectField({
-                            label: 'Target Language',
-                            instructions: 'Please identify the language that you want to be supplied.',
+                            label: 'Target Language'|t('translated'),
+                            instructions: 'Please identify the language that you want to be supplied.'|t('translated'),
                             id: 'targetLanguage',
                             name: 'targetLanguage',
                             required: 'required',
@@ -114,8 +124,10 @@
                 <div class="half">
                     {{
                         forms.selectField({
-                            label: 'Genre',
-                            instructions: 'Select a category that best describes the subject matter of your text to help allocate this to the most appropriate translator.',
+                            label: 'Genre'|t('translated'),
+                            instructions: 'Select a category that best describes the subject matter of your text to help allocate this to the most appropriate translator.'|t(
+                                'translated'
+                            ),
                             id: 'translationSubject',
                             name: 'translationSubject',
                             options: availableSubjects,
@@ -127,8 +139,10 @@
                 <div class="half">
                     {{
                         forms.textField({
-                            label: 'Word Count',
-                            instructions: 'This will be automatically generated from the submitted entry, however, if you are uploading your own document then you will need to provide this information.',
+                            label: 'Word Count'|t('translated'),
+                            instructions: 'This will be automatically generated from the submitted entry, however, if you are uploading your own document then you will need to provide this information.'|t(
+                                'translated'
+                            ),
                             id: 'wordCount',
                             name: 'wordCount',
                             required: 'required',
@@ -142,8 +156,8 @@
             <div class="full">
                 {{
                     forms.textareaField({
-                        label: 'Notes',
-                        instructions: 'Provide additional notes to the translator',
+                        label: 'Notes'|t('translated'),
+                        instructions: 'Provide additional notes to the translator'|t('translated'),
                         id: 'translationNotes',
                         name: 'translationNotes',
                         value: form['translationNotes'] ?? data['translationNotes'] ?? ''
@@ -160,8 +174,10 @@
 
                     {{
                         forms.textareaField({
-                            label: 'Content',
-                            instructions: 'You can either add your text directly to this text field or upload a document',
+                            label: 'Content'|t('translated'),
+                            instructions: 'You can either add your text directly to this text field or upload a document'|t(
+                                'translated'
+                            ),
                             id: 'translationContent',
                             name: 'translationContent',
                             required: 'required',
@@ -179,8 +195,10 @@
             <div class="full">
                 {{
                     forms.elementSelectField({
-                        label: 'Select file to translate',
-                        instructions: 'Accepted formats include: CSV, Word and Text. Your translation will be returned in the same format.',
+                        label: 'Select file to translate'|t('translated'),
+                        instructions: 'Accepted formats include: CSV, Word and Text. Your translation will be returned in the same format.'|t(
+                            'translated'
+                        ),
                         id: 'translationAsset',
                         name: 'translationAsset',
                         viewMode: 'large',

@@ -11,11 +11,11 @@
         url: url('translated')
     },
     {
-        label: 'Orders',
+        label: 'Orders'|t('translated'),
         url: url('translated/orders')
     },
     {
-        label: 'Order ' ~ data['id'],
+        label: ('Order'|t('translated')) ~ ' ' ~ data['id'],
         url: url('translated/orders/view/' ~ data['id'])
     }
 ] %}
@@ -24,8 +24,13 @@
     {% if orderInfo is defined %}
         <div id="alerts" class="mb-8">
             <p>
-                Failed to sync content automatically. There may be an issue with the supplied file. Contact your project
-                manager <a class="pm-error" href="mailto:{{ orderInfo[0].pm_email ?? orderInfo.pm_email }}">
+                {{
+                    'Failed to sync content automatically. There may be an issue with the supplied file. Contact your project
+                manager'|t(
+                        'translated'
+                    )
+                }}
+                <a class="pm-error" href="mailto:{{ orderInfo[0].pm_email ?? orderInfo.pm_email }}">
                     {{ orderInfo[0].pm_name ?? orderInfo.pm_name }}
                 </a>
             </p>
@@ -33,7 +38,9 @@
     {% endif %}
 
     <p>
-        <strong class="knock">Original Entry</strong><br /> <a href="{{ entry.cpEditUrl }}">{{ entry.title }}</a>
+        <strong class="knock">{{ 'Original Entry'|t('translated') }}</strong><br /> <a href="{{ entry.cpEditUrl }}">{{
+                entry.title
+            }}</a>
     </p>
     <form method="post">
         {{ csrfInput() }}
@@ -43,7 +50,7 @@
         {{
             forms.selectField({
                 label: 'Site',
-                instructions: 'Select which site to push the translated content to',
+                instructions: 'Select which site to push the translated content to'|t('translated'),
                 id: 'siteId',
                 name: 'siteId',
                 required: 'required',
@@ -51,7 +58,7 @@
             })
         }}
         <ul class="errors hidden sync-error" js-err>
-            <li>Select which site to push the translated content to</li>
+            <li>{{ 'Select which site to push the translated content to'|t('translated') }}</li>
         </ul>
 
         <input type="hidden" id="id" name="id" value="{{ data['id'] }}" />
@@ -60,7 +67,7 @@
         {% endif %}
         {% endnamespace %}
 
-        <input type="submit" class="submit btn" js-submit value="{{ 'Sync Content'|t }}" />
+        <input type="submit" class="submit btn" js-submit value="{{ 'Sync Content'|t('translated') }}" />
     </form>
 {% endset %}
 
