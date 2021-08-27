@@ -104,6 +104,8 @@ class DataService extends Component
         } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
             try {
                 $reader = new ReaderCsv();
+                $reader->setInputEncoding(ReaderCsv::GUESS_ENCODING);
+                $reader->setFallbackEncoding('ISO-8859-2');
                 $spreadsheet = @$reader->load($filepath . DIRECTORY_SEPARATOR . $filename) ?? null;
                 $writer = new WriterCsv($spreadsheet);
                 $writer->save($filepath . DIRECTORY_SEPARATOR . 'csv_' . $filename);

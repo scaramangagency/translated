@@ -4,6 +4,7 @@ namespace scaramangagency\translated\elements\actions;
 
 use scaramangagency\translated\Translated;
 
+use Craft;
 use craft\base\ElementAction;
 use craft\elements\db\ElementQueryInterface;
 
