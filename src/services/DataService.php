@@ -105,7 +105,7 @@ class DataService extends Component
             try {
                 $reader = new ReaderCsv();
                 $reader->setInputEncoding(ReaderCsv::GUESS_ENCODING);
-                $reader->setFallbackEncoding('ISO-8859-2');
+                $reader->setFallbackEncoding('CP1252');
                 $spreadsheet = @$reader->load($filepath . DIRECTORY_SEPARATOR . $filename) ?? null;
                 $writer = new WriterCsv($spreadsheet);
                 $writer->save($filepath . DIRECTORY_SEPARATOR . 'csv_' . $filename);
