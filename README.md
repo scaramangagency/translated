@@ -1,3 +1,5 @@
+![translated](https://user-images.githubusercontent.com/1694957/131972268-443c045e-11f8-487c-b79e-4aaac1fff0bc.gif)
+
 # Translated plugin for Craft CMS 3.x
 
 Website Internationalisation is fine until you need to suddenly need to speak 10 different languages and fluently enough to translate technical content. This is where the fabulous Translated plugin steps in. Select a page. Click the Translate button. Send it to the Translated translation service. Approve the quote. Receive the translated content back directly in Craft and sync it to the original Craft entry. Et voilà!
